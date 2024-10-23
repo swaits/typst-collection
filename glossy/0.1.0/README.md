@@ -149,7 +149,7 @@ sections, groups, and entries are displayed.
 
 - **section**: This is a main glossary section. It contains multiple glossary groups.
 - **group**: A group within the main glossary section. Contains multiple
-  entries. Can be an empty string `""` or `none`.
+  entries. Can be `none`.
 - **entry**: A single entry within a group. This is the actual term, and can
   include any of the fields in entry. Contains the following fields:
   - `key`: The term key. (always present and unique)

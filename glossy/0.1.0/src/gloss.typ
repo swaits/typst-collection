@@ -9,6 +9,7 @@
 // given an array of dictionaries, make sure each has all the keys we'll
 // reference, using default values if needed
 #let __normalize_entries(entry-list) = {
+  // TODO: panic if key or short missing, all others optional
   let new-list = ()
   for entry in entry-list {
     let long = entry.at("long", default: none)
@@ -33,8 +34,7 @@
 // update our state with a glossary entry
 #let __add_entry(entry) = {
   // make sure our final glossary state does not already have this key
-  let has_key = __gloss_entries.final().at(entry.key, default: false)
-  if has_key == true {
+  if __gloss_entries.final().at(entry.key, default: false) == true {
     panic("Glossary error. Duplicate key: " + entry.key)
   }
 
@@ -82,7 +82,7 @@
 }
 
 // update the usage count for a given key
-#let __save_count(key, count) = {
+#let __save_term_usage(key, count) = {
   __gloss_used.update(st => {
     st.insert(key, count)
     return st;
@@ -101,7 +101,7 @@
 #let __gls(
   key,
   modifiers: array
-) = context {
+) = {
 
   // Get the term
   let entry = __get_entry(key)
@@ -116,7 +116,7 @@
   let first = key_index == 0
 
   // Count the entry as used so we can link back from glossary
-  __save_count(entry.key, key_index + 1)
+  __save_term_usage(entry.key, key_index + 1)
 
   // Helper: Apply pluralization if needed
   let pluralize_term = (singular, plural) => {
@@ -166,20 +166,22 @@
   let is_long = "long" in modifiers and not is_both
   let is_short = "short" in modifiers and not is_both and not is_long
 
-  // Final display logic
-  let display = if is_both or is_long or is_short {
-    // User requested specific behavior via modifiers
-    select_term(is_long, is_both)
-  } else {
-    // Default behavior: show "both" on first use, else "short"
-    select_term(false, first)
+  context {
+    // Final display logic
+    let display = if is_both or is_long or is_short {
+      // User requested specific behavior via modifiers
+      select_term(is_long, is_both)
+    } else {
+      // Default behavior: show "both" on first use, else "short"
+      select_term(false, first)
+    }
+
+    // TODO: figure out how to link to __dict_label(key) if the glossary exists
+    // NOTE: this is a low priority, I don't think it's that important or useful.
+
+    // Emit with labels for this instance of the term usage
+    [#display#metadata(display)#__term_label(key, key_index)]
   }
-
-  // TODO: figure out how to link to __dict_label(key) if the glossary exists
-  // NOTE: this is a low priority, I don't think it's that important or useful.
-
-  // Emit with labels for this instance of the term usage
-  [#display#metadata(display)#__term_label(key, key_index)]
 }
 
 // Create all the backlinks to term uses in a doc, in the form of page numbers
@@ -294,6 +296,7 @@
       }
     }
     if cur.len() > 0 {
+      if g == "" { g = none }
       output.insert(g, cur.sorted(key: e => e.short))
     }
   }
