@@ -45,9 +45,11 @@ which one to display.
   table.header([*Input*], [*Output*]),
 
 [`@tps:short:long`      ], [@tps:short:long],
+[`@tps:long:short`      ], [@tps:long:short],
 [`@tps:short:both`       ], [@tps:short:both],
 [`@tps:long:both`       ], [@tps:long:both],
 [`@tps:short:long:both`   ], [@tps:short:long:both],
+[`@tps:long:pl`    ], [@tps:long:pl],
 )
 
 #let my-theme = (
