@@ -1,4 +1,4 @@
-#import "@preview/rfc-vibe:0.1.1": *
+#import "/lib.typ": *
 
 #set page(paper: "us-letter", margin: 0.75in)
 #set par(justify: true)
