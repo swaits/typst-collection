@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the destination directory
-DEST_DIR="$HOME/Code/typst-packages-fork/packages/preview"
+DEST_DIR="$HOME/Code/forks/typst-packages-fork/packages/preview"
 
 # Move to the source directory
 cd preview
