@@ -3,11 +3,14 @@
 # Set the destination directory
 DEST_DIR="$HOME/Code/typst-packages-fork/packages/preview"
 
+# Move to the source directory
+cd preview
+
 # Ensure the destination directory exists
 mkdir -p "$DEST_DIR"
 
 # Loop through all directories in the current directory
-for dir in preview/*/; do
+for dir in */; do
   if [ -d "$dir" ]; then
     # Remove trailing slash from directory name
     dir=${dir%/}
