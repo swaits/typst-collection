@@ -73,6 +73,7 @@
       spacing: 0.4em,
       grid(
         columns: (auto, 1fr, auto),
+        align: left+bottom,
         gutter: 0.5em,
         // Term and description column
         box[#term#entry.label#long-form #description],

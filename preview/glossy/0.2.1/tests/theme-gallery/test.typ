@@ -6,10 +6,17 @@
     long: "Hypertext Markup Language",
     description: "A standard language for creating web pages",
   ),
+  iphone: (
+    short: "iPhone",
+    description: "Revolutionized phones."
+  ),
   css: (
     short: "CSS",
     long: "Cascading Style Sheets",
     description: "A language used for describing the presentation of a document",
+  ),
+  atom: (
+    short: "atom",
   ),
   tps: (
     short: "TPS",
@@ -23,7 +30,7 @@
 #text(size: 18pt, weight: "bold")[Theme Gallery]
 
 First, we refer to each term at least once so they'll actually show up in the
-glossaries. Our terms include: @html:cap, @css, and @tps.
+glossaries. Our terms include: @atom, @iphone, @html:cap, @css, and @tps.
 
 // TODO: ask Discord if there's a way to get a symbol (ie function) name as a
 // TODO: figure out if there's a way to get a symbol (ie function) name as a
@@ -39,7 +46,7 @@ glossaries. Our terms include: @html:cap, @css, and @tps.
     spacing: 2em,
     inset: 1em,
     stroke: 1pt+gray,
-    glossary(title: raw(theme.first()), theme: theme.last())
+    glossary(title: raw(theme.first()), theme: theme.last(), ignore-case: true)
   )
 }
 
@@ -50,5 +57,5 @@ glossaries. Our terms include: @html:cap, @css, and @tps.
   inset: 1em,
   stroke: 1pt+gray,
   height: 1.5in,
-  glossary(title: raw("theme-twocol"), theme: theme-twocol)
+  glossary(title: raw("theme-twocol"), theme: theme-twocol, ignore-case: true)
 )

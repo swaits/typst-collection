@@ -60,13 +60,11 @@
       size: 0.75em,
       weight: "light",
       grid(
-        columns: (auto,auto,auto,1fr,1em,auto),
-        align: (left, left, left, center, center, right),
-        [#short-display#entry.label],  // Term with label
-        [#long-display],               // Long form (if any)
-        [#description],                // Description (if any)
+        columns: (auto,1fr,1em,auto),
+        align: (left, center, center, right),
+        [#short-display#entry.label#long-display#description],  // Term with label
         [#repeat(h(0.25em) + "." + h(0.25em))],  // Dotted leader line
-        [ . ],                         // Final dot
+        [ . ], // A 1em wide dot so we definitely get some break between term and pages
         [#entry.pages]                 // Page references
       )
     )
