@@ -178,52 +178,10 @@ Control how terms appear in the document by providing a custom `show-term` funct
 
 #### Included Themes
 
-Glossy comes with several built-in themes that can be used directly or serve as examples for custom themes:
+Glossy comes with several built-in themes that can be used directly or serve as
+examples for custom themes:
 
-##### theme-twocol
-
-A professional two-column layout ideal for technical documentation. Features:
-
-- Two-column layout for efficient space usage
-- Dotted leaders to page numbers
-- Clear hierarchy with optional group headings
-- Compact but readable formatting
-- Terms in regular weight with long forms and descriptions inline
-
-```typst
-#glossary(theme: theme-twocol)
-```
-
-##### theme-basic
-
-A traditional single-column layout similar to book glossaries. Features:
-
-- Bold terms with indented content
-- Clear separation between entries
-- Hanging indentation for wrapped lines
-- Parenthetical long forms
-- Page numbers with "pp." prefix
-- Simple, clean design
-
-```typst
-#glossary(theme: theme-basic)
-```
-
-##### theme-compact
-
-A space-efficient layout perfect for technical documents or appendices. Features:
-
-- Reduced vertical spacing
-- Smaller font sizes for secondary information
-- Color-coded term components
-- Grid-based alignment
-- Minimal decorative elements
-- Gray text for supplementary information
-- Bullet separators between components
-
-```typst
-#glossary(theme: theme-compact)
-```
+![theme gallery image](themeshots.png)
 
 #### Custom Themes
 
