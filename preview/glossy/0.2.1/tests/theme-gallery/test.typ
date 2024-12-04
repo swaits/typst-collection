@@ -27,22 +27,32 @@
 
 #show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
 
-#text(size: 18pt, weight: "bold")[Theme Gallery]
+#set page(
+  margin: 1cm,
+  height: auto,
+)
 
-First, we refer to each term at least once so they'll actually show up in the
-glossaries. Our terms include: @atom, @iphone, @html:cap, @css, and @tps.
+#text(size: 24pt, weight: "bold")[`glossy`: theme gallery]
 
-// TODO: ask Discord if there's a way to get a symbol (ie function) name as a
+#text(size: 1pt, fill: rgb(0,0,0,0))[
+  First, we refer to each term at least once so they'll actually show up in the
+  glossaries. Our terms include: @atom, @iphone, @html:cap, @css, and @tps.
+]
+#v(-2em)
+
 // TODO: figure out if there's a way to get a symbol (ie function) name as a
 // string or content
 #let themes = (
+  ("theme-academic", theme-academic),
   ("theme-basic",   theme-basic),
+  ("theme-chicago-index", theme-chicago-index),
   ("theme-compact", theme-compact),
 )
 
 #for theme in themes {
   block(
     breakable: false,
+    width: 100%,
     spacing: 2em,
     inset: 1em,
     stroke: 1pt+gray,
@@ -53,7 +63,7 @@ glossaries. Our terms include: @atom, @iphone, @html:cap, @css, and @tps.
 // HACK: special case theme-twocol so we can restrict the height
 #block(
   breakable: false,
-  spacing: 2em,
+  spacing: 1em,
   inset: 1em,
   stroke: 1pt+gray,
   height: 1.5in,
