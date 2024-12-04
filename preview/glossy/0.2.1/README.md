@@ -154,8 +154,9 @@ Display the glossary using the `glossary()` function:
 
 ```typst
 #glossary(
-  title: "Web Development Glossary",
-  theme: my-theme,
+  title: "Web Development Glossary", // Optional: defaults to Glossary
+  theme: my-theme, // Optionaal: defaults to theme-twocol
+  ignore-case: false, // Optional: ignore case when sorting terms
   groups: ("Web")  // Optional: Filter to specific groups
 )
 ```
