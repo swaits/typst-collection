@@ -40,32 +40,15 @@
 ]
 #v(-2em)
 
-// TODO: figure out if there's a way to get a symbol (ie function) name as a
-// string or content
-#let themes = (
-  ("theme-academic", theme-academic),
-  ("theme-basic",   theme-basic),
-  ("theme-chicago-index", theme-chicago-index),
-  ("theme-compact", theme-compact),
-)
-
-#for theme in themes {
+#import "/src/themes.typ"
+#for theme in dictionary(themes) {
   block(
     breakable: false,
     width: 100%,
     spacing: 2em,
     inset: 1em,
     stroke: 1pt+gray,
+    height: if theme.first() == "theme-twocol" { 1.5in } else { auto },
     glossary(title: raw(theme.first()), theme: theme.last(), ignore-case: true)
   )
 }
-
-// HACK: special case theme-twocol so we can restrict the height
-#block(
-  breakable: false,
-  spacing: 1em,
-  inset: 1em,
-  stroke: 1pt+gray,
-  height: 1.5in,
-  glossary(title: raw("theme-twocol"), theme: theme-twocol, ignore-case: true)
-)
