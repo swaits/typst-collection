@@ -281,7 +281,7 @@
     .map(l => locate(l))
     .map(loc => numbering(
       __default(loc.page-numbering(), "1"),
-      counter(page).at(loc)
+      ..counter(page).at(loc)
     ))
 
   // Create links, excluding duplicate page numbers
