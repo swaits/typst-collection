@@ -30,6 +30,7 @@
 #set page(
   margin: 1cm,
   height: auto,
+  numbering: "1",
 )
 
 #text(size: 24pt, weight: "bold")[`glossy`: theme gallery]

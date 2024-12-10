@@ -271,35 +271,28 @@
 // Example output: "1, 3, 5" where each number links to the term usage on that page
 //
 #let __create_backlinks(key, count) = {
-  // Generate labels for each term usage
-  let labels = for i in range(count) {
-    (__term_label(key, i),)
+  // Convert term (key + count) to labels with their displayed page numbers
+  let page_labels = range(count).map(i => {
+    let label = __term_label(key, i)
+    let loc = locate(label)
+    (
+      label,
+      numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
+    )
+  })
+
+  // Filter out repeated page numbers using a regular loop
+  let seen = (:)
+  let singulated = ()
+  for (label, page) in page_labels {
+    if not seen.keys().contains(page) {
+      seen.insert(page, true)
+      singulated.push((label, page))
+    }
   }
 
-  // Get page numbers for each usage
-  let pages = labels
-    .map(l => locate(l))
-    .map(loc => numbering(
-      __default(loc.page-numbering(), "1"),
-      loc.page()
-    ))
-
-  // Create links, excluding duplicate page numbers
-  let seen = ()
-  let links = for i in range(labels.len()) {
-    let label = labels.at(i)
-    let page = pages.at(i)
-
-    if seen.contains(page) {
-      (none,)
-    } else {
-      seen.push(page)
-      (link(label, page),)
-    }
-  }.filter(l => l != none)
-
-  // Join links with commas
-  links.join(", ")
+  // Convert resulting set to array of links
+  singulated.map(((label, page)) => link(label, page)).join(", ")
 }
 
 // Initializes the glossary system and sets up term reference handling.

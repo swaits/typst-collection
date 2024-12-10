@@ -22,6 +22,7 @@
 #show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
 
 #set heading(numbering: "1.1")
+#set page(numbering: "1")
 
 = Hello, `glossy`!
 In modern web development, languages like @html and @css are essential.

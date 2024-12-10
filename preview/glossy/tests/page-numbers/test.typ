@@ -8,7 +8,6 @@
   ),
   iphone: (
     short: "iPhone",
-    long: "iPhone",
   ),
   css: (
     short: "CSS",
@@ -17,7 +16,6 @@
   ),
   atom: (
     short: "atom",
-    long: "atom",
   ),
   tps: (
     short: "TPS",
@@ -26,15 +24,28 @@
   ),
 )
 
-#show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
+#show: init-glossary.with(myGlossary)
+
+#set page(numbering: "i")
+
+@html, @iphone, @css
+
+#pagebreak()
 
 #set page(numbering: "1")
 
-= Refer to our terms so they show up in the glossary
-@html, @iphone:long, @css, @css:cap:pl, @atom:pl, @tps:long
+@html, @iphone, @css, @atom
 
-= Default sorting
-#glossary(theme: theme-compact)
+#pagebreak()
 
-= Case-insensitive sorting (`ignore-case: true`)
-#glossary(ignore-case: true, theme: theme-compact)
+#counter(page).update(1)
+#set page(numbering: "A")
+
+@html, @iphone, @css, @tps
+
+#pagebreak()
+
+#set page(numbering: "I")
+@css, @iphone, @tps
+
+#glossary(theme: theme-chicago-index, ignore-case: true)
