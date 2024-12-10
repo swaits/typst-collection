@@ -7,6 +7,7 @@ tasks:
   - mirror-to-github: |
       cd ~/typst-collection
       ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      # Explicitly fetch all branches & tags
+      git fetch origin '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*' --prune
       git remote add github git@github.com:swaits/typst-collection.git
-      git fetch --all --prune
       git push --mirror github
