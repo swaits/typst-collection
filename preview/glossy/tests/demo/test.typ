@@ -1,6 +1,6 @@
 // a minimal example, also listed in the README
 
-#import "@preview/glossy:0.2.0": *
+#import "/lib.typ": *
 
 #let myGlossary = (
   html: (
