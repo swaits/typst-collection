@@ -215,7 +215,9 @@
 // Main wrapper (usually used in a `#show: init-glossary`) which loads the
 // entries passed in into our state. Furthermore, hooks into references so that
 // we can intercept term usage in a doc and label them appropriately.
-#let init-glossary(entries, body) = context {
+//
+// Pass a function in `show-term(term-body)` to control how you display terms.
+#let init-glossary(entries, show-term: (term-body) => term-body, body) = context {
   for entry in __normalize_entries(entries) {
     __add_entry(entry)
   }
@@ -224,7 +226,7 @@
   show ref: r => {
     let (key, ..modifiers) = str(r.target).split(":")
     if __has_entry(key) {
-      __gls(key, modifiers: modifiers)
+      show-term(__gls(key, modifiers: modifiers))
     } else {
       r
     }

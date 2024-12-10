@@ -43,7 +43,7 @@ different goals:
 ### Import the package
 
 ```typst
-#import "@preview/glossy:0.1.1": *
+#import "@preview/glossy:0.1.2": *
 
 ```
 
@@ -85,6 +85,32 @@ Note that you could also load glossary entries from a data file using
 [#yaml()](https://typst.app/docs/reference/data-loading/yaml/),
 [#json()](https://typst.app/docs/reference/data-loading/json/), or
 [similar](https://typst.app/docs/reference/data-loading/).
+
+For example, the above glossary could be in this YAML file:
+
+```yaml
+- key: html,
+  short: HTML,
+  long: Hypertext Markup Language,
+  description: A standard language for creating web pages,
+  group: Web
+
+- key: css
+  short: CSS,
+  long: Cascading Style Sheets,
+  description: A stylesheet language used for describing the presentation of a document,
+  group: Web
+
+- key: tps,
+  short: TPS,
+  long: test procedure specification
+```
+
+And then loaded during initialization as follows:
+
+```typst
+#show: init-glossary.with(yaml("glossary.yaml"))
+```
 
 ### Using Glossary Terms in Your Document
 
@@ -142,7 +168,27 @@ the title and specify a theme if desired:
 #glossary(title: "Web Development Glossary", theme: my-theme, groups: ("Web"))
 ```
 
-### Themes
+See more on theming below in "Glossary Themes."
+
+### Customizing the Output
+
+#### Term usage in documents
+
+You can control how terms are displayed when using the `@term` reference syntax
+in your document by passing a custom function to `init-glossary` in the
+`show-term` parameter.
+
+For example, if you wanted all terms to be italicized, you could do this:
+
+```typst
+#let emph-term(body) = { emph(body) }
+
+#show: init-glossary.with(myGlossary, show-term: emph-term)
+
+// remainder of document follows
+```
+
+#### Glossary Themes
 
 Customize the appearance of the glossary using themes. Each theme defines how
 sections, groups, and entries are displayed.
