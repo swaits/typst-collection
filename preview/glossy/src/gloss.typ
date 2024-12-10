@@ -6,223 +6,340 @@
 
 #let __gloss_label_prefix = "__gloss:"
 
-// given an array of dictionaries, make sure each has all the keys we'll
-// reference, using default values if needed
-#let __normalize_entries(entry-list) = {
-  // TODO: panic if key or short missing, all others optional
-  let new-list = ()
-  for entry in entry-list {
-    let long = entry.at("long", default: none)
-    let longplural = entry.at("longplural", default: none)
-    if long != none and longplural == none {
-      longplural = __pluralize(long)
-    }
-
-    new-list.push((
-      key: entry.key,
-      short: entry.short,
-      plural: entry.at("plural", default: __pluralize(entry.short)),
-      long: long,
-      longplural: longplural,
-      description: entry.at("description", default: none),
-      group: entry.at("group", default: ""),
-    ))
+// Normalizes a dictionary entry by ensuring all required and optional keys exist
+// with appropriate default values.
+//
+// Parameters:
+//   entry (dictionary): Input dictionary containing at least 'short' and optionally
+//                      'long', 'plural', 'longplural', 'description', and 'group'
+//
+// Returns:
+//   dictionary: Normalized dictionary with all expected keys populated
+//
+// Throws:
+//   - If 'short' key is missing
+//   - If 'short' value is not a string
+//   - If 'short' value is an empty string
+//
+#let __normalize_entry(entry) = {
+  // Validate required fields
+  if not "short" in entry {
+    panic("Entry must contain a 'short' key")
   }
-  return new-list
+  if type(entry.short) != "string" {
+    panic("Entry 'short' must be a string")
+  }
+  if entry.short.trim() == "" {
+    panic("Entry 'short' cannot be empty")
+  }
+
+  // Extract values with defaults, using consistent none for missing optionals
+  let long = entry.at("long", default: none)
+
+  // Return the normalized entry
+  (
+    short: entry.short,
+    plural: entry.at("plural", default: __pluralize(entry.short)),
+    long: long,
+    longplural: entry.at("longplural", default: __pluralize(long)),
+    description: entry.at("description", default: none),
+    group: entry.at("group", default: "")
+  )
 }
 
-// update our state with a glossary entry
-#let __add_entry(entry) = {
-  // make sure our final glossary state does not already have this key
-  if __gloss_entries.final().at(entry.key, default: false) == true {
-    panic("Glossary error. Duplicate key: " + entry.key)
-  }
+// Checks if a key exists in the glossary state.
+//
+// Parameters:
+//   key (string): The key to look up in the glossary entries
+//
+// Returns:
+//   boolean: True if the key exists in the glossary, false otherwise
+//
+#let __has_entry(key) = {
+  key in __gloss_entries.final().keys()
+}
 
-  // add it to the state
-  __gloss_entries.update(st => {
-    st.insert(entry.key, entry)
-    return st
+// Updates the glossary state by adding or updating an entry.
+//
+// Parameters:
+//   key (string): The key under which to store the entry
+//   entry (dictionary): The normalized glossary entry to store
+//
+// Returns:
+//   none: Updates state as a side effect
+//
+#let __add_entry(key, entry) = {
+  __gloss_entries.update(state => {
+    state.insert(key, entry)
+    state
   })
 }
 
-// fetch a glossary entry from our state, or panic
+// Retrieves a glossary entry from the state.
+//
+// Parameters:
+//   key (string): The key of the entry to retrieve
+//
+// Returns:
+//   dictionary: The glossary entry associated with the key
+//
+// Throws:
+//   - If the key does not exist in the glossary
+//
 #let __get_entry(key) = {
-    let entries = __gloss_entries.final()
-    if key not in entries {
-      panic("Glossary error. Missing key: " + key)
-    }
+  let entries = __gloss_entries.final()
+  if key not in entries.keys() {
+    panic("Glossary error: Missing key '" + key + "'")
+  }
 
-    entries.at(key)
+  entries.at(key)
 }
 
-// returns true if an entry with `key` is in our glossary state
-#let __has_entry(key) = {
-    let entries = __gloss_entries.final()
-    key in entries
-}
-
-// helper to prefix a key for label/reference scoping for the dictionary entry
+// Creates a prefixed label string for dictionary entries and term usage.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//
+// Returns:
+//   string: The prefixed label string for dictionary entries
+//
 #let __dict_label_str(key) = {
   __gloss_label_prefix + key
 }
 
-// helper to get a label with prefix for the dictionary entry
+// Creates a label object for dictionary entries.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//
+// Returns:
+//   label: A Typst label object for the dictionary entry
+//
 #let __dict_label(key) = {
   label(__dict_label_str(key))
 }
 
-// helper to prefix a key for label/reference scoping for the term use in a doc
+// Creates a prefixed label string for term usage in documents.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   index (int): The occurrence index of the term in the document
+//
+// Returns:
+//   string: The prefixed label string for term usage
+//
 #let __term_label_str(key, index) = {
   __gloss_label_prefix + key + "." + str(index)
 }
 
-// helper to get a label with prefix for the term use in a doc
+// Creates a label object for term usage in documents.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   index (int): The occurrence index of the term in the document
+//
+// Returns:
+//   label: A Typst label object for the term usage
+//
 #let __term_label(key, index) = {
   label(__term_label_str(key, index))
 }
 
-// update the usage count for a given key
+// Updates the term usage count in the glossary state.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   count (int): The number of times the term has been used
+//
+// Returns:
+//   none: Updates state as a side effect
+//
 #let __save_term_usage(key, count) = {
-  __gloss_used.update(st => {
-    st.insert(key, count)
-    return st;
+  __gloss_used.update(state => {
+    state.insert(key, count)
+    state
   })
 }
 
-// the main function which emits terms used in a document
+// Renders a glossary term with various formatting options.
 //
-// handles all the modifiers:
+// This function handles the display of terms in the document, managing both first
+// and subsequent uses, pluralization, capitalization, and different display forms
+// (short, long, or combined forms).
 //
-// - cap: capitalize the term
-// - pl: pluralize the term
-// - both: emit "Long form (short form)"
-// - short: emit just the short form
-// - long: emit just the long form
-#let __gls(
-  key,
-  modifiers: array
-) = {
-
-  // Get the term
+// Parameters:
+//   key (string): The glossary entry key to render
+//   modifiers (array): Array of modifier strings that control term rendering:
+//     - "cap": Capitalize the first letter of the term
+//     - "pl": Use plural form of the term
+//     - "both": Show "Long form (short form)"
+//     - "short": Show only the short form
+//     - "long": Show only the long form
+//     - "def" or "desc": Show the term's description instead
+//
+// Returns:
+//   content: Formatted term with appropriate labels and metadata
+//
+// Behavior:
+//   - Without modifiers, first use shows "Long form (short form)", subsequent uses show short form
+//   - Explicit modifiers override the default first-use behavior
+//   - If long form is requested but unavailable, falls back to short form
+//   - Maintains usage counter for term references
+//
+#let __gls(key, modifiers: array) = {
+  // Fetch the entry and prepare label
   let entry = __get_entry(key)
   let entry_label = __dict_label_str(key)
 
-  // Lookup and increment the count
+  // Handle description mode
+  if "def" in modifiers or "desc" in modifiers {
+    return [#entry.description]
+  }
+
+  // Track term usage
   let entry_counter = counter(entry_label)
   entry_counter.step()
-
-  // See if this is the first use
   let key_index = entry_counter.get().first()
   let first = key_index == 0
 
-  // Count the entry as used so we can link back from glossary
-  __save_term_usage(entry.key, key_index + 1)
+  __save_term_usage(key, key_index + 1)
 
-  // Helper: Apply pluralization if needed
+  // Helper: Apply pluralization if requested
   let pluralize_term = (singular, plural) => {
     if "pl" in modifiers and plural != none { plural } else { singular }
   }
 
-  // Helper: Capitalize term if "cap" modifier present
+  // Helper: Apply capitalization if requested
   let capitalize_term = (term) => {
     if "cap" in modifiers { upper(term.first()) + term.slice(1) } else { term }
   }
 
-  // Helper: Format a term with pluralization and capitalization
+  // Helper: Apply both pluralization and capitalization
   let format_term = (term, plural) => {
     capitalize_term(pluralize_term(term, plural))
   }
 
-  // Helper: Select and format the displayed term (long, short, or both)
+  // Helper: Select and format the appropriate term form
   let select_term = (is_long_mode, use_both) => {
-    // Derive pluralized and capitalized versions of the long and short forms
     let short_form = format_term(entry.short, entry.plural)
-    let long_form = if entry.long != none { format_term(entry.long, entry.longplural) } else { none }
+    let long_form = if entry.long != none {
+      format_term(entry.long, entry.longplural)
+    } else {
+      none
+    }
 
-    // Return logic for term selection:
     if use_both and long_form != none {
-      // 1. If "both" is requested AND we have a long form available:
-      //    Show "Long Form (Short Form)"
       [#long_form (#short_form)]
     } else if is_long_mode and long_form != none {
-      // 2. If long mode is requested AND we have a long form available:
-      //    Show just the long form
       [#long_form]
     } else {
-      // 3. Fallback case - use short form when:
-      //    - "both" was requested but no long form exists
-      //    - long mode was requested but no long form exists
-      //    - short form was explicitly requested
-      //    - no specific mode was requested
       [#short_form]
     }
   }
 
-  // Determine which form to display: "short", "long", or "both"
+  // Determine display mode from modifiers
   let is_both = "both" in modifiers
   let is_long = "long" in modifiers and not is_both
   let is_short = "short" in modifiers and not is_both and not is_long
 
   context {
-    // Final display logic
+    // Generate final display based on modifiers or default behavior
     let display = if is_both or is_long or is_short {
-      // User requested specific behavior via modifiers
       select_term(is_long, is_both)
     } else {
-      // Default behavior: show "both" on first use, else "short"
       select_term(false, first)
     }
 
-    // TODO: figure out how to link to __dict_label(key) if the glossary exists
-    // NOTE: this is a low priority, I don't think it's that important or useful.
-
-    // Emit with labels for this instance of the term usage
+    // Emit term with metadata and usage label
     [#display#metadata(display)#__term_label(key, key_index)]
   }
 }
 
-// Create all the backlinks to term uses in a doc, in the form of page numbers
-// linked. Used when emitting a glossary, so its page numbers can link back to
-// the uses.
+// Creates page number links back to each usage of a glossary term.
+//
+// This function generates a comma-separated list of page numbers, where each
+// number links back to a usage of the term in the document. Duplicate page
+// numbers are removed to avoid redundancy.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   count (int): Number of times the term appears in the document
+//
+// Returns:
+//   content: Comma-separated list of linked page numbers
+//
+// Example output: "1, 3, 5" where each number links to the term usage on that page
+//
 #let __create_backlinks(key, count) = {
-  // create array of labels to link to
+  // Generate labels for each term usage
   let labels = for i in range(count) {
     (__term_label(key, i),)
   }
 
-  // create arrays of locations, and page number display text
+  // Get page numbers for each usage
   let pages = labels
-    .map(l => { locate(l) })
-    .map((loc) => { numbering(__default(loc.page-numbering(), "1"), loc.page()) })
+    .map(l => locate(l))
+    .map(loc => numbering(
+      __default(loc.page-numbering(), "1"),
+      loc.page()
+    ))
 
-  // convert labels to links, filtering out duplicated pages
+  // Create links, excluding duplicate page numbers
   let seen = ()
   let links = for i in range(labels.len()) {
-    let l = labels.at(i)
-    let p = pages.at(i)
-    if seen.contains(p) {
+    let label = labels.at(i)
+    let page = pages.at(i)
+
+    if seen.contains(page) {
       (none,)
     } else {
-      seen.push(p)
-      (link(l, p),)
+      seen.push(page)
+      (link(label, page),)
     }
   }.filter(l => l != none)
 
-  // connect links with commas and return
+  // Join links with commas
   links.join(", ")
 }
 
-// Main wrapper (usually used in a `#show: init-glossary`) which loads the
-// entries passed in into our state. Furthermore, hooks into references so that
-// we can intercept term usage in a doc and label them appropriately.
+// Initializes the glossary system and sets up term reference handling.
 //
-// Pass a function in `show-term(term-body)` to control how you display terms.
-#let init-glossary(entries, show-term: (term-body) => term-body, body) = context {
-  for entry in __normalize_entries(entries) {
-    __add_entry(entry)
+// This function is typically used with `#show: init-glossary`. It performs
+// three main tasks:
+// 1. Validates and loads glossary entries into the state
+// 2. Sets up reference handling to intercept and format term usage
+// 3. Applies custom term formatting if provided
+//
+// Parameters:
+//   entries (dictionary): Dictionary of glossary entries where:
+//     - keys are term identifiers
+//     - values are entry dictionaries containing term details
+//   show-term ((content) => content): Optional function to customize term rendering
+//     Default: Returns term content unchanged
+//   body (content): Document content to process
+//
+// Returns:
+//   content: Processed document content with glossary functionality enabled
+//
+// Throws:
+//   - If entries parameter is not a dictionary
+//
+#let init-glossary(
+  entries,
+  show-term: (term-body) => term-body,
+  body
+) = context {
+  // Validate entries parameter type
+  if type(entries) != dictionary {
+    panic("entries must be a dictionary, instead got: " + repr(entries))
   }
 
-  // convert refs we recognize into links with labels
+  // Process and store each glossary entry
+  for (key, entry) in entries {
+    __add_entry(key, __normalize_entry(entry))
+  }
+
+  // Set up reference handling for glossary terms
   show ref: r => {
     let (key, ..modifiers) = str(r.target).split(":")
     if __has_entry(key) {
@@ -235,93 +352,113 @@
   body
 }
 
-// Used to print a glossary. Can customize title, theme, and/or specify groups.
+// Renders a complete glossary with customizable formatting and grouping.
 //
-// A theme is a dictionary with three attributes:
+// The glossary displays all used terms, optionally grouped by category, with page
+// references back to term usage. The appearance is controlled by a theme that
+// defines how sections, groups, and entries are formatted.
 //
-// #let my-theme = (
-//   section: (title, body) => {
-//     // how to display the glossary section and its body which will contain
-//     // groups, each with their entries
-//   },
+// Parameters:
+//   title (string): Glossary section title (default: "Glossary")
+//   theme (dictionary): Controls glossary appearance with three functions:
+//     - section(title, body): Renders the main glossary section
+//       - title: The glossary title
+//       - body: Content containing all groups and entries
+//     - group(name, index, total, body): Renders a group of related terms
+//       - name: Group name
+//       - index: Zero-based group index
+//       - total: Total number of groups
+//       - body: Content containing the group's entries
+//     - entry(entry, index, total): Renders a single glossary entry
+//       - entry: Dictionary containing:
+//         - short: Short form of term
+//         - long: Long form of term (optional)
+//         - description: Term description (optional)
+//         - label: Term's dictionary label
+//         - pages: Linked page numbers where term appears
+//       - index: Zero-based entry index within group
+//       - total: Total entries in group
+//   groups (array): Optional list of groups to include
+//                  If empty, includes all groups
 //
-//   group: (name, body) => {
-//     // how to display a group name and its body (which will contain the
-//     // entries in that group)
-//   },
+// Returns:
+//   content: Formatted glossary content
 //
-//   entry: (entry, i, n) => {
-//     // how to display a single entry, along with its index and total count
-//   }
-// }
-
-#let glossary(title: "Glossary", theme: theme-2col, groups: ()) = context {
-  // our output is a map of group name to array of entries (each entry is a map)
+// Throws:
+//   - If a requested group doesn't exist
+//
+#let glossary(
+  title: "Glossary",
+  theme: theme-twocol,
+  groups: ()
+) = context {
+  // Collect and organize entries by group
   let output = (:)
-
-  // pull in entire dictionary
   let all_entries = __gloss_entries.final()
-
-  // filter down to just what we used
   let all_used = __gloss_used.final()
 
-  // TODO: what about entries with no group? Or group == "" or == none
+  // Determine which groups to process
+  let all_groups = all_entries
+    .values()
+    .map(e => e.at("group"))
+    .dedup()
+    .sorted()
 
-  // get all groups
-  let all_groups = all_entries.values().map(e => e.at("group")).dedup().sorted()
-  let groups = if groups.len() == 0 { all_groups } else { groups }
-
-  // make sure requested groups are legit
-  for g in groups {
-    if g not in all_groups {
-      panic("Requested group not found: " + g)
-    }
-  }
-
-  // iterate one group at a time
-  for g in groups {
-    // collect used entries in this group
-    let cur = ()
-    for (key, count) in all_used {
-      let e = all_entries.at(key)
-      if e.at("group") == g {
-        // this term is both in this group and was used, add to our output
-        let short = e.at("short")
-        let long = e.at("long")
-        let description = e.at("description")
-        let label = [#metadata(key)#__dict_label(key)]
-        let pages = __create_backlinks(key, count)
-        cur.push((short: short, long: long, description: description, label: label, pages: pages))
+  let target_groups = if groups.len() == 0 {
+    all_groups
+  } else {
+    // Validate requested groups exist
+    for g in groups {
+      if g not in all_groups {
+        panic("Requested group not found: " + g)
       }
     }
-    if cur.len() > 0 {
-      if g == none { g = "" }
-      output.insert(g, cur.sorted(key: e => e.short))
-    }
+    groups
   }
 
-  // TODO: rendering for a) just one group, or b) the default group (ie terms
-  // with no group)??  -- in this case should we just not use the theme.group()
-  // function?
+  // Process entries group by group
+  for group in target_groups {
+    let current_entries = ()
 
-  // index for group because dictionary don't have enumerate()
-  let i_group = 0;
+    // Collect all used entries for this group
+    for (key, count) in all_used {
+      let entry = all_entries.at(key)
+      if entry.at("group") == group {
+        current_entries.push((
+          short: entry.at("short"),
+          long: entry.at("long"),
+          description: entry.at("description"),
+          label: [#metadata(key)#__dict_label(key)],
+          pages: __create_backlinks(key, count)
+        ))
+      }
+    }
 
-  // render it using our theme
+  // Add non-empty groups to output
+  if current_entries.len() > 0 {
+    group = if group == none { "" } else { group }
+    output.insert(
+      group,
+      current_entries.sorted(key: e => e.short)
+    )
+  }
+}
+
+  // Render the glossary using the theme
+  let group_index = 0
+
   (theme.section)(
     title,
-    // section body (all groups)
     for (group, entries) in output {
       (theme.group)(
         group,
-        i_group,
+        group_index,
         output.len(),
-        // group body (all entries)
-        for (i,e) in entries.enumerate() {
-          (theme.entry)(e, i, entries.len())
-        },
+        for (i, entry) in entries.enumerate() {
+          (theme.entry)(entry, i, entries.len())
+        }
       )
-      i_group += 1
+      group_index += 1
     }
   )
 }

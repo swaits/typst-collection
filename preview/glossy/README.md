@@ -16,94 +16,97 @@ different goals:
 1. Provide a simple interface which allows for complete control over glossary
    display. To do this, `glossy`'s `#glossary()` function accepts a theme
    parameter. The goal here is to separate presentation and logic.
-1. Simplify the user interface as much as possible. Glossy has exactly two
+2. Simplify the user interface as much as possible. Glossy has exactly two
    exports, `init-glossary` and `glossary`.
-1. Double-down on `glossy`'s excellent `@term` reference approach, completely
+3. Double-down on `glossy`'s excellent `@term` reference approach, completely
    eliminating the need to make any calls to `gls()` and friends.
-1. Mimic established patterns and best practices. For example, `glossy`'s
+4. Mimic established patterns and best practices. For example, `glossy`'s
    `#glossary()` function is intentionally similar (in naming and parameters) to
-   `typst`'s built-int `#bibliography`, to the degree possible.
-1. Simplify the implementation. The `glossy` code is significantly shorter and
+   `typst`'s built-in `#bibliography`, to the degree possible.
+5. Simplify the implementation. The `glossy` code is significantly shorter and
    easier to understand.
 
 ## Features
 
-- Define glossary terms with short and long forms, descriptions, and grouping.
-- Automatically tracks term usage in the document, making references simple
-  through @labels.
-- Supports modifiers to adjust how terms are displayed (capitalize, pluralize,
-  etc.).
-- Generates a formatted glossary section with backlinks to term occurrences in
-  the document.
-- Easily customizable themes for rendering glossary sections, groups, and
-  entries.
+- Define glossary terms with short and long forms, descriptions, and grouping
+- Automatically tracks term usage in the document through `@labels`
+- Supports modifiers to adjust how terms are displayed (capitalize, pluralize, etc.)
+- Generates a formatted glossary section with backlinks to term occurrences
+- Customizable themes for rendering glossary sections, groups, and entries
+- Automatic pluralization of terms with custom override options
+- Page number references back to term usage locations
 
 ## Usage
 
 ### Import the package
 
 ```typst
-#import "@preview/glossy:0.1.2": *
-
+#import "@preview/glossy:0.2.0": *
 ```
 
 ### Defining Glossary Terms
 
-Use the `init-glossary` function to initialize glossary entries and process
-document content:
+Use the `init-glossary` function to initialize glossary entries:
 
 ```typst
 #let myGlossary = (
-    (
-      key: "html",
+    html: (
       short: "HTML",
       long: "Hypertext Markup Language",
       description: "A standard language for creating web pages",
       group: "Web"
     ),
-    (
-      key: "css",
+    css: (
       short: "CSS",
       long: "Cascading Style Sheets",
       description: "A stylesheet language used for describing the presentation of a document",
       group: "Web"
     ),
-    (
-      key: "tps",
+    tps: (
       short: "TPS",
-      long: "test procedure specification"
-    ),
-    // Add more entries as needed
+      long: "test procedure specification",
+      description: "A formal document describing test steps and expected results",
+      // Optional: Override automatic pluralization
+      plural: "TPSes",
+      longplural: "test procedure specifications"
+    )
 )
 
 #show: init-glossary.with(myGlossary)
-
-// Your document content here, where glossary terms are used.
 ```
 
-Note that you could also load glossary entries from a data file using
-[#yaml()](https://typst.app/docs/reference/data-loading/yaml/),
-[#json()](https://typst.app/docs/reference/data-loading/json/), or
-[similar](https://typst.app/docs/reference/data-loading/).
+Each glossary entry supports the following fields:
+
+- `short` (required): Short form of the term
+- `long` (optional): Long form of the term
+- `description` (optional): Term description (often a definition)
+- `group` (optional): Category grouping
+- `plural` (optional): Override automatic pluralization of short form
+- `longplural` (optional): Override automatic pluralization of long form
+
+You can also load glossary entries from a data file using #yaml(), #json(), or similar.
 
 For example, the above glossary could be in this YAML file:
 
 ```yaml
-- key: html,
-  short: HTML,
-  long: Hypertext Markup Language,
-  description: A standard language for creating web pages,
+html:
+  short: HTML
+  long: Hypertext Markup Language
+  description: A standard language for creating web pages
   group: Web
 
-- key: css
-  short: CSS,
-  long: Cascading Style Sheets,
-  description: A stylesheet language used for describing the presentation of a document,
+css:
+  short: CSS
+  long: Cascading Style Sheets
+  description: A stylesheet language used for describing the presentation of a document
   group: Web
 
-- key: tps,
-  short: TPS,
+tps:
+  short: TPS
   long: test procedure specification
+  description: A formal document describing test steps and expected results
+  plural: TPSes
+  longplural: test procedure specifications
 ```
 
 And then loaded during initialization as follows:
@@ -112,115 +115,139 @@ And then loaded during initialization as follows:
 #show: init-glossary.with(yaml("glossary.yaml"))
 ```
 
-### Using Glossary Terms in Your Document
+### Using Glossary Terms
 
-Use glossary terms within your text using the `@reference` functionality in
-typst.
-
-For example, `@html` and `@css` are used in the following text:
+Reference glossary terms using Typst's `@reference` syntax:
 
 ```typst
 In modern web development, languages like @html and @css are essential.
-
-Now make sure I get your @tps:short reports by 2pm!
+The @tps:pl need to be submitted by Friday.
 ```
 
-... which should output:
+Available modifiers:
 
-```text
-In modern web development, languages like Hypertext Markup Language (HTML) and
-Cascading Style Sheets (CSS) are essential.
+- **cap**: Capitalizes the term
+- **pl**: Uses the plural form
+- **both**: Shows "Long Form (Short Form)"
+- **short**: Shows only short form
+- **long**: Shows only long form
+- **def** or **desc**: Shows the description
 
-Now make sure I get your TPS reports by 2pm!
-```
+Modifiers can be combined with colons:
 
-You can control how each term is displayed using the following modifiers:
-
-- **cap**: Capitalizes the term.
-- **pl**: Uses the plural form of the term.
-- **both**: Displays both the long and short forms (e.g., "Long Form (Short Form)").
-- **short**: Displays only the short form.
-- **long**: Displays only the long form.
-
-Each modifier is separated by a colon (':') character. Examples:
-
-| **Input**               | **Output**                                   |
-| ----------------------- | -------------------------------------------- |
-| `@tps` (first use)      | "technical procedure specification (TPS)"    |
-| `@tps` (subsequent use) | "TPS"                                        |
-| `@tps:short`            | "TPS"                                        |
-| `@tps:long`             | "technical procedure specification (TPS)"    |
-| `@tps:both`             | "technical procedure specification (TPS)"    |
-| `@tps:long:cap`         | "Technical procedure specification"          |
-| `@tps:long:pl`          | "technical procedure specifications"         |
-| `@tps:short:pl`         | "TPSes"                                      |
-| `@tps:both:pl:cap`      | "Technical procedure specifications (TPSes)" |
-
-Combine modifiers in any way you like. But know that if you combine any of
-`short`, `long`, and/or `both`, only one will be used.
+| **Input**           | **Output**                                                     |
+| ------------------- | -------------------------------------------------------------- |
+| `@tps` (first use)  | "test procedure specification (TPS)"                           |
+| `@tps` (subsequent) | "TPS"                                                          |
+| `@tps:short`        | "TPS"                                                          |
+| `@tps:long`         | "test procedure specification"                                 |
+| `@tps:both`         | "test procedure specification (TPS)"                           |
+| `@tps:long:cap`     | "Test procedure specification"                                 |
+| `@tps:long:pl`      | "test procedure specifications"                                |
+| `@tps:short:pl`     | "TPSes"                                                        |
+| `@tps:both:pl:cap`  | "Technical procedure specifications (TPSes)"                   |
+| `@tps:def`          | "A formal document describing test steps and expected results" |
 
 ### Generating the Glossary
 
-To display the glossary in your document, use the `glossary` function. Customize
-the title and specify a theme if desired:
+Display the glossary using the `glossary()` function:
 
 ```typst
-#glossary(title: "Web Development Glossary", theme: my-theme, groups: ("Web"))
+#glossary(
+  title: "Web Development Glossary",
+  theme: my-theme,
+  groups: ("Web")  // Optional: Filter to specific groups
+)
 ```
 
-See more on theming below in "Glossary Themes."
+### Customizing Term Display
 
-### Customizing the Output
-
-#### Term usage in documents
-
-You can control how terms are displayed when using the `@term` reference syntax
-in your document by passing a custom function to `init-glossary` in the
-`show-term` parameter.
-
-For example, if you wanted all terms to be italicized, you could do this:
+Control how terms appear in the document by providing a custom `show-term` function:
 
 ```typst
-#let emph-term(body) = { emph(body) }
+#let emph-term(term-body) = { emph(term-body) }
 
-#show: init-glossary.with(myGlossary, show-term: emph-term)
-
-// remainder of document follows
+#show: init-glossary.with(
+  myGlossary,
+  show-term: emph-term
+)
 ```
 
-#### Glossary Themes
+### Glossary Themes
 
-Customize the appearance of the glossary using themes. Each theme defines how
-sections, groups, and entries are displayed.
+#### Included Themes
 
-- **section**: This is a main glossary section. It contains multiple glossary groups.
-- **group**: A group within the main glossary section. Contains multiple
-  entries. Can be an empty string for terms with no group (`""`).
-- **entry**: A single entry within a group. This is the actual term, and can
-  include any of the fields in entry. Contains the following fields:
-  - `key`: The term key. (always present and unique)
-  - `short`: The short form of the term. (always present)
-  - `long`: The long form. (can be `none`)
-  - `description`: The description or definition. (can be `none`)
-  - `pages`: Pages with links to term usage in doc. (always present)
+Glossy comes with several built-in themes that can be used directly or serve as examples for custom themes:
 
-Example of a minimal theme:
+##### theme-twocol
+
+A professional two-column layout ideal for technical documentation. Features:
+
+- Two-column layout for efficient space usage
+- Dotted leaders to page numbers
+- Clear hierarchy with optional group headings
+- Compact but readable formatting
+- Terms in regular weight with long forms and descriptions inline
+
+```typst
+#glossary(theme: theme-twocol)
+```
+
+##### theme-basic
+
+A traditional single-column layout similar to book glossaries. Features:
+
+- Bold terms with indented content
+- Clear separation between entries
+- Hanging indentation for wrapped lines
+- Parenthetical long forms
+- Page numbers with "pp." prefix
+- Simple, clean design
+
+```typst
+#glossary(theme: theme-basic)
+```
+
+##### theme-compact
+
+A space-efficient layout perfect for technical documents or appendices. Features:
+
+- Reduced vertical spacing
+- Smaller font sizes for secondary information
+- Color-coded term components
+- Grid-based alignment
+- Minimal decorative elements
+- Gray text for supplementary information
+- Bullet separators between components
+
+```typst
+#glossary(theme: theme-compact)
+```
+
+#### Custom Themes
+
+Customize glossary appearance by defining a theme with three functions:
 
 ```typst
 #let my-theme = (
+  // Main glossary section
   section: (title, body) => {
     heading(level: 1, title)
     body
   },
-  group: (name, i, n, body) => {
-    // i is the group's index, n is total number of groups
-    if name != "" and n > 1 {
+
+  // Group of related terms
+  group: (name, index, total, body) => {
+    // index = group index, total = total groups
+    if name != "" and total > 1 {
       heading(level: 2, name)
     }
     body
   },
-  entry: (entry, i, n) => {
-    // i is the entry's index, n is total number of entries
+
+  // Individual glossary entry
+  entry: (entry, index, total) => {
+    // index = entry index, total = total entries in group
     let output = [#entry.short]
     if entry.long != none {
       output = [#output -- #entry.long]
@@ -239,6 +266,14 @@ Example of a minimal theme:
   }
 )
 ```
+
+Entry fields available to themes:
+
+- `short`: Short form (always present)
+- `long`: Long form (can be `none`)
+- `description`: Term description (can be `none`)
+- `label`: Term's dictionary label
+- `pages`: Linked page numbers where term appears
 
 ## License
 
