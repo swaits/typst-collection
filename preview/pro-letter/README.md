@@ -16,7 +16,7 @@ This Typst template lets you create professional business letters effortlessly.
 To use this template, import it and configure the parameters as shown:
 
 ```typst
-#import "@preview/pro-letter:0.1.0": pro-letter
+#import "@preview/pro-letter:0.1.1": pro-letter
 
 #show: pro-letter.with(
   sender: (
@@ -97,7 +97,7 @@ the form of a dictionary. Include only the fields necessary for your letter:
 
 ### Text and Style Settings
 
-- **`font`**: The typeface to use for the letter. Defaults to "Linux Libertine".
+- **`font`**: The typeface to use for the letter. Defaults to "Libertinus Serif".
 - **`size`**: Font size. Defaults to 11pt.
 - **`weight`**: Font weight. Defaults to "light".
 - **`strong-delta`**: Additional weight for bold text. Defaults to 300.

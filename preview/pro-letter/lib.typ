@@ -47,7 +47,7 @@
   notary-page: false,
 
   // text settings
-  font: "Linux Libertine",
+  font: "Libertinus Serif",
   size: 11pt,
   weight: "light",
   strong-delta: 300,

@@ -1,4 +1,4 @@
-#import "@preview/pro-letter:0.1.0": pro-letter
+#import "@preview/pro-letter:0.1.1": pro-letter
 
 #show: pro-letter.with(
   sender: (
