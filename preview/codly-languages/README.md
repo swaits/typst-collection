@@ -10,10 +10,10 @@ Pretty simple. Import `codly`. Initialize it. Import `codly-languages`.
 Configure `codly` with the languages. Like this:
 
 ```typst
-#import "@preview/codly:1.0.0": *
+#import "@preview/codly:1.1.0": *
 #show: codly-init
 
-#import "@preview/codly-languages:0.1.2": *
+#import "@preview/codly-languages:0.1.3": *
 #codly(languages: codly-languages)
 ```
 
