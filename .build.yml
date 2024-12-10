@@ -8,4 +8,5 @@ tasks:
       cd ~/typst-collection
       ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
       git remote add github git@github.com:swaits/typst-collection.git
+      git fetch --all --prune
       git push --mirror github
