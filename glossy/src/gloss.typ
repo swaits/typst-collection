@@ -1,3 +1,7 @@
+// TODO: replace with @preview when back online
+#import "@preview/valkyrie:0.2.1" as z
+
+#import "./schemas.typ": *
 #import "./themes.typ": *
 #import "./utils.typ": *
 
@@ -332,10 +336,15 @@
   show-term: (term-body) => term-body,
   body
 ) = context {
-  // Validate entries parameter type
-  if type(entries) != dictionary {
-    panic("entries must be a dictionary, instead got: " + repr(entries))
+  // Type checking
+  let checked-entries = (:)
+  for (key, entry) in entries {
+    let checked-key = z.parse(key, z.string(), scope: ("dictionary key",))
+    let checked-entry = z.parse(entry, dict-schema, scope: ("dictionary entry",))
+    checked-entries.insert(checked-key, checked-entry)
   }
+  let checked-show-term = z.parse(show-term, z.function(), scope: ("show-term",))
+  let checked-body = z.parse(body, z.content(), scope: ("body",))
 
   // Process and store each glossary entry
   for (key, entry) in entries {
@@ -396,6 +405,12 @@
   ignore-case: false,
   groups: (),
 ) = context {
+  // Type checking
+  let checked-title = z.parse(title, z.content(), scope: ("title",))
+  let checked-groups = z.parse(groups, groups-list-schema, scope: ("groups",))
+  let checked-ignore-case = z.parse(ignore-case, z.boolean(), scope: ("ignore-case",))
+  let checked-theme = z.parse(theme, theme-schema, scope: ("theme",))
+
   // Collect and organize entries by group
   let output = (:)
   let all_entries = __gloss_entries.final()
@@ -405,19 +420,23 @@
   let all_groups = all_entries
     .values()
     .map(e => e.at("group"))
+    .map(g => { if g == none { "" } else { g } })
     .dedup()
     .sorted()
 
-  let target_groups = if groups.len() == 0 {
+  let target_groups = if checked-groups.len() == 0 {
     all_groups
   } else {
     // Validate requested groups exist
-    for g in groups {
+    for g in checked-groups {
+      if g == none {
+        g = ""
+      }
       if g not in all_groups {
-        panic("Requested group not found: " + g)
+        panic("Requested group, '" + g + "', not found.")
       }
     }
-    groups
+    checked-groups
   }
 
   // Process entries group by group
@@ -459,15 +478,15 @@
   // Render the glossary using the theme
   let group_index = 0
 
-  (theme.section)(
+  (checked-theme.section)(
     title,
     for (group, entries) in output {
-      (theme.group)(
+      (checked-theme.group)(
         group,
         group_index,
         output.len(),
         for (i, entry) in entries.enumerate() {
-          (theme.entry)(entry, i, entries.len())
+          (checked-theme.entry)(entry, i, entries.len())
         }
       )
       group_index += 1

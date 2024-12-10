@@ -168,6 +168,19 @@ Display the glossary using the `glossary()` function:
 )
 ```
 
+Note that if you want to display terms without a group, you specify that with an
+empty string. For example, to show the empty group and then the _Web_ group:
+
+```typst
+#glossary(groups: ("", "Web"))
+```
+
+Or to just show the empty group (i.e. terms without a group):
+
+```typst
+#glossary(groups: (""))
+```
+
 ### Customizing Term Display
 
 Control how terms appear in the document by providing a custom `show-term` function:
