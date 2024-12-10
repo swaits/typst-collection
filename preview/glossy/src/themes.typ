@@ -5,8 +5,8 @@
     columns(2, body)
   },
 
-  group: (name, body) => {
-    if name != none {
+  group: (name, i, n, body) => {
+    if name != "" and n > 1 {
       heading(level: 2, name)
     }
     body

@@ -128,35 +128,32 @@
     if "cap" in modifiers { upper(term.first()) + term.slice(1) } else { term }
   }
 
+  // Helper: Format a term with pluralization and capitalization
+  let format_term = (term, plural) => {
+    capitalize_term(pluralize_term(term, plural))
+  }
+
   // Helper: Select and format the displayed term (long, short, or both)
   let select_term = (is_long_mode, use_both) => {
     // Derive pluralized and capitalized versions of the long and short forms
-    let long_form = capitalize_term(pluralize_term(entry.long, entry.longplural))
-    let short_form = capitalize_term(pluralize_term(entry.short, entry.plural))
+    let short_form = format_term(entry.short, entry.plural)
+    let long_form = if entry.long != none { format_term(entry.long, entry.longplural) } else { none }
 
-    // If "both" modifier is present, show both the long form and short form
-    if use_both {
-      // If the long form exists, show "Long Form (Short Form)"
-      if long_form != none {
-        [#long_form (#short_form)]
-      }
-      // Fallback: If no long form exists, just show the short form
-      else {
-        [#short_form]
-      }
-    }
-    // If in "long mode", show the long form, fallback to short if long form is missing
-    else if is_long_mode {
-      if long_form != none {
-        [#long_form]
-      }
-      // Fallback: if no long form, show short
-      else {
-        [#short_form]
-      }
-    }
-    // Default case: Just show the short form
-    else {
+    // Return logic for term selection:
+    if use_both and long_form != none {
+      // 1. If "both" is requested AND we have a long form available:
+      //    Show "Long Form (Short Form)"
+      [#long_form (#short_form)]
+    } else if is_long_mode and long_form != none {
+      // 2. If long mode is requested AND we have a long form available:
+      //    Show just the long form
+      [#long_form]
+    } else {
+      // 3. Fallback case - use short form when:
+      //    - "both" was requested but no long form exists
+      //    - long mode was requested but no long form exists
+      //    - short form was explicitly requested
+      //    - no specific mode was requested
       [#short_form]
     }
   }
@@ -296,7 +293,7 @@
       }
     }
     if cur.len() > 0 {
-      if g == "" { g = none }
+      if g == none { g = "" }
       output.insert(g, cur.sorted(key: e => e.short))
     }
   }
@@ -305,16 +302,24 @@
   // with no group)??  -- in this case should we just not use the theme.group()
   // function?
 
+  // index for group because dictionary don't have enumerate()
+  let i_group = 0;
+
   // render it using our theme
   (theme.section)(
     title,
+    // section body (all groups)
     for (group, entries) in output {
       (theme.group)(
         group,
+        i_group,
+        output.len(),
+        // group body (all entries)
         for (i,e) in entries.enumerate() {
           (theme.entry)(e, i, entries.len())
         },
       )
+      i_group += 1
     }
   )
 }

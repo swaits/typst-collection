@@ -43,7 +43,7 @@ different goals:
 ### Import the package
 
 ```typst
-#import "@preview/glossy:0.1.0": *
+#import "@preview/glossy:0.1.1": *
 
 ```
 
@@ -149,7 +149,7 @@ sections, groups, and entries are displayed.
 
 - **section**: This is a main glossary section. It contains multiple glossary groups.
 - **group**: A group within the main glossary section. Contains multiple
-  entries. Can be `none`.
+  entries. Can be an empty string for terms with no group (`""`).
 - **entry**: A single entry within a group. This is the actual term, and can
   include any of the fields in entry. Contains the following fields:
   - `key`: The term key. (always present and unique)
@@ -166,8 +166,9 @@ Example of a minimal theme:
     heading(level: 1, title)
     body
   },
-  group: (name, body) => {
-    if name != none and name != "" {
+  group: (name, i, n, body) => {
+    // i is the group's index, n is total number of groups
+    if name != "" and n > 1 {
       heading(level: 2, name)
     }
     body

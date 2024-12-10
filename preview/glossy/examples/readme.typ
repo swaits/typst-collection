@@ -1,6 +1,6 @@
 // a minimal example, also listed in the README
 
-#import "@preview/glossy:0.1.0": *
+#import "@preview/glossy:0.1.1": *
 
 #let myGlossary = (
     (key: "html", short: "HTML", long: "Hypertext Markup Language", description: "A standard language for creating web pages", group: "Web"),
@@ -11,10 +11,15 @@
 
 #show: init-glossary.with(myGlossary)
 
+#set heading(numbering: "1.1")
+
+= Hello, `glossy`!
+
 In modern web development, languages like @html and @css are essential.
 
 Now make sure I get your @tps:short reports by 2pm!
 
+= Examples with modifiers
 
 #table(
   columns: 2,
@@ -29,13 +34,31 @@ Now make sure I get your @tps:short reports by 2pm!
 [`@tps:both:pl:cap`], [@tps:both:pl:cap],
 )
 
+== Using conflicting modifiers (short, long, both)
+
+These modifiers are semantically mutually exclusive, by they can be combined
+syntactically. When multiple are used, `glossy` tries to make a smart choice on
+which one to display.
+
+#table(
+  columns: 2,
+  table.header([*Input*], [*Output*]),
+
+[`@tps:short:long`      ], [@tps:short:long],
+[`@tps:long:short`      ], [@tps:long:short],
+[`@tps:short:both`       ], [@tps:short:both],
+[`@tps:long:both`       ], [@tps:long:both],
+[`@tps:short:long:both`   ], [@tps:short:long:both],
+[`@tps:long:pl`    ], [@tps:long:pl],
+)
+
 #let my-theme = (
   section: (title, body) => {
     heading(level: 1, title)
     body
   },
-  group: (name, body) => {
-    if name != none and name != "" {
+  group: (name, i, n, body) => {
+    if name != "" and n > 1 {
       heading(level: 2, name)
     }
     body
@@ -61,3 +84,5 @@ Now make sure I get your @tps:short reports by 2pm!
 )
 
 #glossary(theme: my-theme)
+#glossary(title: "Glossary with just empty group", groups: ("",), theme: my-theme)
+#glossary(title: "Glossary with just Web group", groups: ("Web",), theme: my-theme)
