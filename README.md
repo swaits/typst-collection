@@ -15,6 +15,8 @@ links below to their main page.
   glossary system with easily customizable output.
 - [**rfc-vibe**](https://typst.app/universe/package/rfc-vibe): Bring RFC language
   into everyday docs.
+- [**swank-tex**](https://typst.app/universe/package/swank-tex): Render those
+  funky logos for TeX, LaTeX, and friends.
 
 ## Templates
 
