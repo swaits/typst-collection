@@ -21,7 +21,10 @@
 //   - If 'short' value is not a string
 //   - If 'short' value is an empty string
 //
-#let __normalize_entry(entry) = {
+#let __normalize_entry(key, entry) = {
+  if (type(entry) == str){
+    entry = (short: key, long: entry)
+  }
   // Validate required fields
   if not "short" in entry {
     panic("Entry must contain a 'short' key")
@@ -329,7 +332,7 @@
 
   // Process and store each glossary entry
   for (key, entry) in entries {
-    __add_entry(key, __normalize_entry(entry))
+    __add_entry(key, __normalize_entry(key, entry))
   }
 
   // Set up reference handling for glossary terms

@@ -69,7 +69,8 @@ Use the `init-glossary` function to initialize glossary entries:
       // Optional: Override automatic pluralization
       plural: "TPSes",
       longplural: "test procedure specifications"
-    )
+    ),
+    WWW: "World Wide Web", // concise entry with only short: long
 )
 
 #show: init-glossary.with(myGlossary)
@@ -107,6 +108,8 @@ tps:
   description: A formal document describing test steps and expected results
   plural: TPSes
   longplural: test procedure specifications
+
+WWW: World Wide Web
 ```
 
 And then loaded during initialization as follows:
