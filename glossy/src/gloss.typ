@@ -10,21 +10,28 @@
 // with appropriate default values.
 //
 // Parameters:
+//   key: The key from the input dictionary
 //   entry (dictionary): Input dictionary containing at least 'short' and optionally
 //                      'long', 'plural', 'longplural', 'description', and 'group'
+//
+//   entry (string): If you pass a string to entry, we assume you're using the
+//                   abbreviated syntax `short: "long"`, where the `key` is used
+//                   for `short` and `entry` is used for `long`.
 //
 // Returns:
 //   dictionary: Normalized dictionary with all expected keys populated
 //
 // Throws:
-//   - If 'short' key is missing
+//   - If 'short' key is missing when using normal (non-abbreviated) syntax
 //   - If 'short' value is not a string
 //   - If 'short' value is an empty string
 //
 #let __normalize_entry(key, entry) = {
-  if (type(entry) == str){
+  // If it's a string, it's using the abbreviated syntax `short: "long"`.
+  if (type(entry) == str) {
     entry = (short: key, long: entry)
   }
+
   // Validate required fields
   if not "short" in entry {
     panic("Entry must contain a 'short' key")

@@ -85,6 +85,10 @@ Each glossary entry supports the following fields:
 - `plural` (optional): Override automatic pluralization of short form
 - `longplural` (optional): Override automatic pluralization of long form
 
+Note that if you just want an entry with `short` and `long`, you can use the
+abbreviated syntax. In this case, they `key` is used as the short form, and its
+value is used as the long form. See `WWW` as an example below.
+
 You can also load glossary entries from a data file using #yaml(), #json(), or similar.
 
 For example, the above glossary could be in this YAML file:
