@@ -1,4 +1,3 @@
-// TODO: replace with @preview when back online
 #import "@preview/valkyrie:0.2.1" as z
 
 #import "./schemas.typ": *
