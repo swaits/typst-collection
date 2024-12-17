@@ -1,4 +1,3 @@
-// TODO: change to @preview when online
 #import "@preview/valkyrie:0.2.1" as z
 
 #let dict-schema = z.either(
