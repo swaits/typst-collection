@@ -551,24 +551,24 @@
         ))
       }
     }
-
-  // Add non-empty groups to output
-  if current_entries.len() > 0 {
-    group = if group == none { "" } else { group }
-
-    // sort entries by case insensitivity if requested
-    let sorted_entries = current_entries
-      // 1. create array of tuples with (lower [if ignore-case], entry)
-      .map(e => { if ignore-case { (lower(e.short), e) } else { (e.short, e) } })
-      // 2. sort the tuples (by first element then second)
-      .sorted(key: t => t.first())
-      // 3. strip away the tuple's first element, leaving an array of entries
-      .map(t => t.last())
-
-    // add entries to this group's output map
-    output.insert(group, sorted_entries)
+  
+    // Add non-empty groups to output
+    if current_entries.len() > 0 {
+      group = if group == none { "" } else { group }
+  
+      // sort entries by case insensitivity if requested
+      let sorted_entries = current_entries
+        // 1. create array of tuples with (lower [if ignore-case], entry)
+        .map(e => { if ignore-case { (lower(e.short), e) } else { (e.short, e) } })
+        // 2. sort the tuples (by first element then second)
+        .sorted(key: t => t.first())
+        // 3. strip away the tuple's first element, leaving an array of entries
+        .map(t => t.last())
+  
+      // add entries to this group's output map
+      output.insert(group, sorted_entries)
+    }
   }
-}
 
   // Render the glossary using the theme
   let group_index = 0
