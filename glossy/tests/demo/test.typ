@@ -17,17 +17,18 @@
     short: "TPS",
     long: "test procedure specification",
     description: "A document on how to run all the test procedures"),
+  unused: "Unused term, which shouldn't print in the glossary."
 )
 
 #show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
 
 #set heading(numbering: "1.1")
-#set page(numbering: "1")
+#set page(height: auto, width: 6.5in, margin: 1em, numbering: "1")
 
 = Hello, `glossy`!
 In modern web development, languages like @html and @css are essential.
 
-Now make sure I get your @tps:short reports by 2pm!
+Now make sure I get @tps:a:SHORT report by 2pm! @an:tps:cap is very important!!!
 
 @tps:cap is defined as: @tps:def.
 
@@ -46,6 +47,31 @@ Now make sure I get your @tps:short reports by 2pm!
   [`@tps:both:pl:cap`], [@tps:both:pl:cap],
   [`@tps:def`        ], [@tps:def],
   [`@tps:desc`       ], [@tps:desc],
+)
+
+== Adding articles via `a`/`an` modifiers
+
+You can add an article to your term by adding the `a` or `an` modifiers (they're
+equivalent, just both available as a convenience). These modifiers are special
+in that they can precede the term's key, like `@a:key`, or follow the key like
+the other modifiers.
+
+Default English modifiers are chosen unless the `article` and/or `longarticle`
+keys are defined for the given entry.
+
+Articles are incompatible with the `pl` (plural) modifier.
+
+#table(
+  columns: 2,
+  table.header([*Input*], [*Output*]),
+
+  [`@a:tps:short`    ], [@a:tps:short],
+  [`@a:tps:long`     ], [@a:tps:long],
+  [`@an:tps:both`    ], [@an:tps:both],
+  [`@an:tps:long:cap`], [@an:tps:long:cap],
+  [`@tps:a:long`     ], [@tps:a:long],
+  [`@tps:a:short`    ], [@tps:a:short],
+  [`@tps:an:both:cap`], [@tps:an:both:cap],
 )
 
 == Using conflicting modifiers (short, long, both)

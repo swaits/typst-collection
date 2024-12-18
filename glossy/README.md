@@ -79,7 +79,9 @@ Use the `init-glossary` function to initialize glossary entries:
 Each glossary entry supports the following fields:
 
 - `short` (required): Short form of the term
+- `article` (optional): Article for use with the short form (i.e. "a", "an")
 - `long` (optional): Long form of the term
+- `longarticle` (optional): Article for use with the long form (i.e. "a", "an")
 - `description` (optional): Term description (often a definition)
 - `group` (optional): Category grouping
 - `plural` (optional): Override automatic pluralization of short form
@@ -96,7 +98,9 @@ For example, the above glossary could be in this YAML file:
 ```yaml
 html:
   short: HTML
+  article: an
   long: Hypertext Markup Language
+  longarticle: a
   description: A standard language for creating web pages
   group: Web
 
@@ -139,6 +143,8 @@ Available modifiers:
 - **short**: Shows only short form
 - **long**: Shows only long form
 - **def** or **desc**: Shows the description
+- **a** or **an**: Include the article (`an` is just an alias of `a`, they're
+  equivalent)
 
 Modifiers can be combined with colons:
 
@@ -154,6 +160,25 @@ Modifiers can be combined with colons:
 | `@tps:short:pl`     | "TPSes"                                                        |
 | `@tps:both:pl:cap`  | "Technical procedure specifications (TPSes)"                   |
 | `@tps:def`          | "A formal document describing test steps and expected results" |
+
+The `a`/`an` modifier is special because it can either precede or follow the
+term's key.
+
+For the English language, you don't need to define `article` and `longarticle`
+in most cases. Glossy makes a decent attempt at computing those automatically.
+
+For example:
+
+| **Input**             | **Output**                                     |
+| --------------------- | ---------------------------------------------- |
+| `@a:tps`(first use)   | "a test procedure specification (TPS)"         |
+| `@tps:an`(subsequent) | "a TPS"                                        |
+| `@an:tps:long:cap`    | "A test procedure specification"               |
+| `@tps:long:an`        | "a test procedure specifications"              |
+| `@tps:a:both:cap`     | "A technical procedure specifications (TPSes)" |
+
+Note that the `a`/`an` (article) modifier cannot be combined with the `pl`
+(plural) modifier.
 
 ### Generating the Glossary
 

@@ -53,8 +53,10 @@
   (
     short: entry.short,
     plural: entry.at("plural", default: __pluralize(entry.short)),
+    article: entry.at("article", default: __determine_article(entry.short)),
     long: long,
     longplural: entry.at("longplural", default: __pluralize(long)),
+    longarticle: entry.at("longarticle", default: __determine_article(long)),
     description: entry.at("description", default: none),
     group: entry.at("group", default: "")
   )
@@ -176,95 +178,203 @@
 
 // Renders a glossary term with various formatting options.
 //
-// This function handles the display of terms in the document, managing both first
-// and subsequent uses, pluralization, capitalization, and different display forms
-// (short, long, or combined forms).
-//
 // Parameters:
-//   key (string): The glossary entry key to render
+//   key (string): The glossary entry key to render.
 //   modifiers (array): Array of modifier strings that control term rendering:
-//     - "cap": Capitalize the first letter of the term
-//     - "pl": Use plural form of the term
-//     - "both": Show "Long form (short form)"
-//     - "short": Show only the short form
-//     - "long": Show only the long form
-//     - "def" or "desc": Show the term's description instead
-//
-// Returns:
-//   content: Formatted term with appropriate labels and metadata
+//     - "cap": Capitalize the first letter of the term.
+//     - "pl": Use plural form of the term.
+//     - "both": Show "Long form (short form)".
+//     - "short": Show only the short form.
+//     - "long": Show only the long form.
+//     - "def" or "desc": Show the term's description instead of its name.
+//     - "a" or "an": Prepend an article, chosen from the entry (short or long form).
+//   show-term (function): A function that renders the chosen term.
 //
 // Behavior:
-//   - Without modifiers, first use shows "Long form (short form)", subsequent uses show short form
-//   - Explicit modifiers override the default first-use behavior
-//   - If long form is requested but unavailable, falls back to short form
-//   - Maintains usage counter for term references
+//   - Without modifiers, the first use of a term shows "Long form (short form)",
+//     subsequent uses show only the short form.
+//   - Explicit modifiers ("long", "short", "both") override the default behavior.
+//   - If a requested long form doesn't exist, the logic falls back to the short form.
+//   - A usage counter tracks how many times a term has been referenced.
 //
-#let __gls(key, modifiers: array) = {
-  // Fetch the entry and prepare label
+// Returns:
+//   content: The fully formatted term, including optional article, capitalization,
+//            usage tracking metadata, and the chosen form (short, long, or both).
+//
+#let __gls(key, modifiers: array, show-term: function) = {
+  // ---------------------------------------------------------------------------
+  // Check for illegal modifier combinations
+  // ---------------------------------------------------------------------------
+  if ("def" in modifiers or "desc" in modifiers) and modifiers.len() > 1 {
+    panic("Cannot use 'def'/'desc' with other modifiers.")
+  }
+  if ("a" in modifiers or "an" in modifiers) and ("pl" in modifiers) {
+    panic("Cannot use 'a'/'an' and 'pl' together.")
+  }
+
+  // ---------------------------------------------------------------------------
+  // Retrieve the glossary entry and its label
+  // ---------------------------------------------------------------------------
   let entry = __get_entry(key)
   let entry_label = __dict_label_str(key)
 
-  // Handle description mode
+  // ---------------------------------------------------------------------------
+  // If "def" or "desc" modifier is present, show the entry's description immediately
+  // ---------------------------------------------------------------------------
   if "def" in modifiers or "desc" in modifiers {
-    return [#entry.description]
+    if entry.description == none {
+      panic("Use of 'def'/'desc' requires a description be defined.")
+    }
+    return show-term([#entry.description])
   }
 
-  // Track term usage
+  // ---------------------------------------------------------------------------
+  // Manage term usage counting and determine if it's the first reference
+  // ---------------------------------------------------------------------------
   let entry_counter = counter(entry_label)
   entry_counter.step()
   let key_index = entry_counter.get().first()
-  let first = key_index == 0
+  let is_first_use = key_index == 0
 
+  // ---------------------------------------------------------------------------
+  // Record another usage of this term (increment the usage counter)
+  // ---------------------------------------------------------------------------
   __save_term_usage(key, key_index + 1)
 
-  // Helper: Apply pluralization if requested
+  // ---------------------------------------------------------------------------
+  // Helper Functions
+  // ---------------------------------------------------------------------------
+
+  // pluralize_term(singular, plural): Returns plural form if "pl" modifier is present and available;
+  // otherwise returns the singular form.
   let pluralize_term = (singular, plural) => {
-    if "pl" in modifiers and plural != none { plural } else { singular }
-  }
-
-  // Helper: Apply capitalization if requested
-  let capitalize_term = (term) => {
-    if "cap" in modifiers { upper(term.first()) + term.slice(1) } else { term }
-  }
-
-  // Helper: Apply both pluralization and capitalization
-  let format_term = (term, plural) => {
-    capitalize_term(pluralize_term(term, plural))
-  }
-
-  // Helper: Select and format the appropriate term form
-  let select_term = (is_long_mode, use_both) => {
-    let short_form = format_term(entry.short, entry.plural)
-    let long_form = if entry.long != none {
-      format_term(entry.long, entry.longplural)
+    if "pl" in modifiers and plural != none {
+      plural
     } else {
-      none
-    }
-
-    if use_both and long_form != none {
-      [#long_form (#short_form)]
-    } else if is_long_mode and long_form != none {
-      [#long_form]
-    } else {
-      [#short_form]
+      singular
     }
   }
 
-  // Determine display mode from modifiers
-  let is_both = "both" in modifiers
-  let is_long = "long" in modifiers and not is_both
-  let is_short = "short" in modifiers and not is_both and not is_long
+  // capitalize_term(article, term): If "cap" is in modifiers, capitalizes the first letter
+  // of whichever text appears first (the article if present, otherwise the term).
+  // Returns a tuple (article, term) which may be modified to have uppercase first letters.
+  let capitalize_term = (article, term) => {
+    if "cap" not in modifiers {
+      (article, term)
+    } else if article == "" {
+      // No article present, so capitalize the term's first letter.
+      (article, upper(term.first()) + term.slice(1))
+    } else {
+      // Article is present; capitalize its first letter instead.
+      (upper(article.first()) + article.slice(1), term)
+    }
+  }
 
+  // get_term(mode): Returns the appropriate term string based on the mode.
+  // mode is one of "short", "long", or "both".
+  //   - "short": Returns the short form.
+  //   - "long": Returns the long form.
+  //   - "both": Returns "Long form (short form)".
+  // We rely on prior logic to ensure that when mode = "both" or "long", a long form is available.
+  let get_term = (mode) => {
+    let short_form = pluralize_term(entry.short, entry.plural)
+    let long_form = pluralize_term(entry.long, entry.longplural) // none safe here
+    if mode == "short" {
+      // Just the short form.
+      short_form
+    } else if mode == "long" {
+      // Just the long form.
+      long_form
+    } else {
+      // mode == "both": "Long form (short form)".
+      long_form + " (" + short_form + ")"
+    }
+  }
+
+  // get_article(mode): Returns the appropriate article string based on the mode.
+  //   - If wants_article is false, returns an empty string.
+  //   - If mode is "short", return the short article.
+  //   - If mode is "long" or "both", return the long article.
+  // The calling logic ensures that when mode = "long" or "both", a long form exists.
+  let get_article = (mode) => {
+    let wants_article = "a" in modifiers or "an" in modifiers
+    if not wants_article {
+      ""
+    } else if mode == "short" {
+      entry.article + " "
+    } else {
+      // mode == "long" or "both"
+      entry.longarticle + " "
+    }
+  }
+
+  // determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available):
+  // Decides which mode ("short", "long", or "both") to use.
+  // Preference is given to explicit modifiers. If the requested mode can't be fulfilled due to no long form,
+  // fall back to "short".
+  // If no explicit mode is given, the default behavior is:
+  //   - On first use and if a long form exists, "both".
+  //   - Otherwise, "short".
+  let determine_mode = (wants_both, wants_long, wants_short, is_first_use, long_available) => {
+    if wants_both {
+      // Explicit request for "both":
+      // If a long form exists, use "both", otherwise fall back to "short".
+      if long_available {
+        "both"
+      } else {
+        "short"
+      }
+    } else if wants_long {
+      // Explicit request for "long":
+      // If a long form exists, use "long", otherwise fall back to "short".
+      if long_available {
+        "long"
+      } else {
+        "short"
+      }
+    } else if wants_short {
+      // Explicit request for "short":
+      // Always "short" regardless of availability.
+      "short"
+    } else {
+      // No explicit mode given:
+      // On first use with a long form available, default to "both".
+      // Otherwise, use "short".
+      if is_first_use and long_available {
+        "both"
+      } else {
+        "short"
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Determine desired options based on modifiers and entry.long availability
+  // ---------------------------------------------------------------------------
+  let wants_both = "both" in modifiers
+  let wants_long = "long" in modifiers
+  let wants_short = "short" in modifiers
+  let long_available = entry.long != none
+
+  // Determine mode using the helper function
+  let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available)
+
+  // Get the article and term for the chosen mode, then apply capitalization if requested
+  let (article, term) = capitalize_term(get_article(mode), get_term(mode))
+
+  // ---------------------------------------------------------------------------
+  // Construct and return the final output
+  // ---------------------------------------------------------------------------
   context {
-    // Generate final display based on modifiers or default behavior
-    let display = if is_both or is_long or is_short {
-      select_term(is_long, is_both)
-    } else {
-      select_term(false, first)
-    }
-
-    // Emit term with metadata and usage label
-    [#display#metadata(display)#__term_label(key, key_index)]
+    [#article#show-term(term)#metadata(term)#__term_label(key, key_index)]
+  // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
+  // \_art.  |               |              |
+  //         \_ apply user formatting function to the term
+  //                         |              |
+  //                         \_ metadata lets us label (ie it's "labelable")
+  //                                        |
+  //                                        \_ i.e. <__gloss.key.0>, etc.
+  //                                           for backlink from glossary
   }
 }
 
@@ -352,10 +462,29 @@
 
   // Set up reference handling for glossary terms
   show ref: r => {
-    let (key, ..modifiers) = str(r.target).split(":")
-    if __has_entry(key) {
-      show-term(__gls(key, modifiers: modifiers))
+    let (raw_key, ..raw_modifiers) = str(r.target).split(":")
+
+    // Determine if we need to swap the key and first modifier.
+    // Conditions for swapping:
+    //  - The original key is "a" or "an" (case-insensitive),
+    //  - That "key" does not correspond to an actual entry,
+    //  - There is at least one modifier,
+    //  - The first modifier corresponds to an existing entry key.
+    let can_swap = (lower(raw_key) == "a" or lower(raw_key) == "an") and not __has_entry(raw_key) and raw_modifiers.len() > 0 and __has_entry(raw_modifiers.first())
+
+    // If we can swap, use the first modifier as the key and insert "a" as the first modifier.
+    let (key, modifiers) = if can_swap {
+      (raw_modifiers.first(), ("a",) + raw_modifiers.slice(1))
     } else {
+      (raw_key, raw_modifiers)
+    }
+
+    // Now see if this is an actual glossary term key
+    if __has_entry(key) {
+      // Found in dictionary, render via __gls()
+      __gls(key, modifiers: modifiers.map(lower), show-term: show-term)
+    } else {
+      // Not one of ours, so just pass it through
       r
     }
   }
