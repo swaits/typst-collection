@@ -134,30 +134,16 @@
   label(__dict_label_str(key))
 }
 
-// Creates a prefixed label string for term usage in documents.
-//
-// Parameters:
-//   key (string): The glossary entry key
-//   index (int): The occurrence index of the term in the document
-//
-// Returns:
-//   string: The prefixed label string for term usage
-//
-#let __term_label_str(key, index) = {
-  __gloss_label_prefix + key + "." + str(index)
-}
-
 // Creates a label object for term usage in documents.
 //
 // Parameters:
 //   key (string): The glossary entry key
-//   index (int): The occurrence index of the term in the document
 //
 // Returns:
 //   label: A Typst label object for the term usage
 //
-#let __term_label(key, index) = {
-  label(__term_label_str(key, index))
+#let __term_label(key) = {
+  label(__gloss_label_prefix + key)
 }
 
 // Updates the term usage count in the glossary state.
@@ -174,6 +160,18 @@
     state.insert(key, count)
     state
   })
+}
+
+// Determine if the glossary contains a visible entry
+//
+// Parameters:
+//   key (string): The glossary entry key
+// 
+// Returns:
+//   boolean: If the entry is visible in the glossary
+//
+#let __has_glossary_entry(key) = {
+  query(<glossary>).len() > 0 and query(selector(label(key)).after(<glossary>)).len() > 0
 }
 
 // Renders a glossary term with various formatting options.
@@ -366,14 +364,14 @@
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    [#article#show-term(term)#metadata(term)#__term_label(key, key_index)]
+    [#article#show-term(term)#metadata(term)#__term_label(key)]
   // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
   // \_art.  |               |              |
   //         \_ apply user formatting function to the term
   //                         |              |
   //                         \_ metadata lets us label (ie it's "labelable")
   //                                        |
-  //                                        \_ i.e. <__gloss.key.0>, etc.
+  //                                        \_ i.e. <__gloss:key>, etc.
   //                                           for backlink from glossary
   }
 }
@@ -386,36 +384,22 @@
 //
 // Parameters:
 //   key (string): The glossary entry key
-//   count (int): Number of times the term appears in the document
 //
 // Returns:
 //   content: Comma-separated list of linked page numbers
 //
 // Example output: "1, 3, 5" where each number links to the term usage on that page
 //
-#let __create_backlinks(key, count) = {
-  // Convert term (key + count) to labels with their displayed page numbers
-  let page_labels = range(count).map(i => {
-    let label = __term_label(key, i)
-    let loc = locate(label)
-    (
-      label,
-      numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
-    )
-  })
-
-  // Filter out repeated page numbers using a regular loop
-  let seen = (:)
-  let singulated = ()
-  for (label, page) in page_labels {
-    if not seen.keys().contains(page) {
-      seen.insert(page, true)
-      singulated.push((label, page))
-    }
-  }
-
-  // Convert resulting set to array of links
-  singulated.map(((label, page)) => link(label, page)).join(", ")
+#let __create_backlinks(key) = {
+  return context query(__term_label(key)) // find all reference
+    .map(meta => { // extract location and page number (or symbol)
+      let loc = meta.location()
+      let page = numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
+      (loc, page)
+    })
+    .dedup(key: ((loc, page)) => page) // deduplicate by page
+    .map(((loc, page)) => link(loc, page)) // create links
+    .join(", ")    
 }
 
 // Initializes the glossary system and sets up term reference handling.
@@ -458,6 +442,10 @@
   // Process and store each glossary entry
   for (key, entry) in entries {
     __add_entry(key, __normalize_entry(key, entry))
+    // Create placeholder labels for autocompletion (if not already present)
+    context if not __has_glossary_entry(key) [
+      #metadata("RF")#label(key)
+    ]
   }
 
   // Set up reference handling for glossary terms
@@ -579,8 +567,8 @@
           short: entry.at("short"),
           long: entry.at("long"),
           description: entry.at("description"),
-          label: [#metadata(key)#__dict_label(key)],
-          pages: __create_backlinks(key, count)
+          label: [#metadata(key)#label(key)],
+          pages: __create_backlinks(key)
         ))
       }
     }
@@ -606,18 +594,21 @@
   // Render the glossary using the theme
   let group_index = 0
 
-  (checked-theme.section)(
-    title,
-    for (group, entries) in output {
-      (checked-theme.group)(
-        group,
-        group_index,
-        output.len(),
-        for (i, entry) in entries.enumerate() {
-          (checked-theme.entry)(entry, i, entries.len())
-        }
-      )
-      group_index += 1
-    }
-  )
+  [
+    #metadata("glossary")<glossary>
+    #(checked-theme.section)(
+      title,
+      for (group, entries) in output {
+        (checked-theme.group)(
+          group,
+          group_index,
+          output.len(),
+          for (i, entry) in entries.enumerate() {
+            (checked-theme.entry)(entry, i, entries.len())
+          }
+        )
+        group_index += 1
+      }
+    )
+  ]
 }
