@@ -17,7 +17,7 @@
     short: "TPS",
     long: "test procedure specification",
     description: "A document on how to run all the test procedures"),
-  unused: "Unused term, which shouldn't print in the glossary."
+   unused: "Unused term, which shouldn't print in the glossary."
 )
 
 #show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
