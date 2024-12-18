@@ -2,7 +2,7 @@
 
 A collection of `typst` templates and packages by [swaits](https://swaits.com/about).
 
-Everything in this collections is available for use at the [`typst`
+Everything in this collection is available for use at the [`typst`
 universe](https://typst.app/universe/). For details on each, please visit the
 links below to their main page.
 
