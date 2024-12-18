@@ -5,7 +5,6 @@
 #import "./utils.typ": *
 
 #let __gloss_entries = state("__gloss_entries", (:))
-#let __gloss_used = state("__gloss_used", (:))
 
 #let __gloss_label_prefix = "__gloss:"
 
@@ -110,30 +109,6 @@
   entries.at(key)
 }
 
-// Creates a prefixed label string for dictionary entries and term usage.
-//
-// Parameters:
-//   key (string): The glossary entry key
-//
-// Returns:
-//   string: The prefixed label string for dictionary entries
-//
-#let __dict_label_str(key) = {
-  __gloss_label_prefix + key
-}
-
-// Creates a label object for dictionary entries.
-//
-// Parameters:
-//   key (string): The glossary entry key
-//
-// Returns:
-//   label: A Typst label object for the dictionary entry
-//
-#let __dict_label(key) = {
-  label(__dict_label_str(key))
-}
-
 // Creates a label object for term usage in documents.
 //
 // Parameters:
@@ -146,21 +121,33 @@
   label(__gloss_label_prefix + key)
 }
 
-// Updates the term usage count in the glossary state.
+// Updates the term usage in the glossary state.
 //
 // Parameters:
 //   key (string): The glossary entry key
-//   count (int): The number of times the term has been used
 //
 // Returns:
 //   none: Updates state as a side effect
 //
-#let __save_term_usage(key, count) = {
-  __gloss_used.update(state => {
-    state.insert(key, count)
-    state
-  })
+#let __mark_term_used(key) = {
+  counter(__gloss_label_prefix + key).step()
 }
+
+// Queries the term usage
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   location (location): The location in the document. Use none for end of document
+//
+// Returns:
+//   boolean: If the entry is used above the location in the document
+//
+#let __is_term_used(key, location: none) = {
+  let c = counter(__gloss_label_prefix + key)
+  c = if location == none {c.final()} else {c.at(location)}
+  c.at(0) > 0
+}
+
 
 // Determine if the glossary contains a visible entry
 //
@@ -214,7 +201,6 @@
   // Retrieve the glossary entry and its label
   // ---------------------------------------------------------------------------
   let entry = __get_entry(key)
-  let entry_label = __dict_label_str(key)
 
   // ---------------------------------------------------------------------------
   // If "def" or "desc" modifier is present, show the entry's description immediately
@@ -229,15 +215,8 @@
   // ---------------------------------------------------------------------------
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
-  let entry_counter = counter(entry_label)
-  entry_counter.step()
-  let key_index = entry_counter.get().first()
-  let is_first_use = key_index == 0
-
-  // ---------------------------------------------------------------------------
-  // Record another usage of this term (increment the usage counter)
-  // ---------------------------------------------------------------------------
-  __save_term_usage(key, key_index + 1)
+  let is_first_use = not __is_term_used(key, location: here())
+  __mark_term_used(key)
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -530,7 +509,7 @@
   // Collect and organize entries by group
   let output = (:)
   let all_entries = __gloss_entries.final()
-  let all_used = __gloss_used.final()
+  let all_used = all_entries.keys().filter(key => __is_term_used(key))
 
   // Determine which groups to process
   let all_groups = all_entries
@@ -560,7 +539,7 @@
     let current_entries = ()
 
     // Collect all used entries for this group
-    for (key, count) in all_used {
+    for key in all_used {
       let entry = all_entries.at(key)
       if entry.at("group") == group {
         current_entries.push((
