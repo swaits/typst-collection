@@ -155,10 +155,10 @@
 //   key (string): The glossary entry key
 // 
 // Returns:
-//   boolean: If the entry is visible in the glossary
+//   boolean: If the term is visible in the glossary (and the label is unique)
 //
 #let __has_glossary_entry(key) = {
-  query(<glossary>).len() > 0 and query(selector(label(key)).after(<glossary>)).len() > 0
+  query(<glossary>).len() > 0 and query(selector(label(key)).after(<glossary>)).len() == 1
 }
 
 // Renders a glossary term with various formatting options.
@@ -174,6 +174,7 @@
 //     - "def" or "desc": Show the term's description instead of its name.
 //     - "a" or "an": Prepend an article, chosen from the entry (short or long form).
 //   show-term (function): A function that renders the chosen term.
+//   term-links (boolean): If terms should be clickable links leading to glossary
 //
 // Behavior:
 //   - Without modifiers, the first use of a term shows "Long form (short form)",
@@ -186,7 +187,7 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, show-term: function) = {
+#let __gls(key, modifiers: array, show-term: function, term-links: true) = {
   // ---------------------------------------------------------------------------
   // Check for illegal modifier combinations
   // ---------------------------------------------------------------------------
@@ -343,7 +344,12 @@
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    [#article#show-term(term)#metadata(term)#__term_label(key)]
+    let text = if term-links and __has_glossary_entry(key) {
+      link(label(key), term) 
+    } else {
+      term
+    }
+    [#article#show-term(text)#metadata(term)#__term_label(key)]
   // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
   // \_art.  |               |              |
   //         \_ apply user formatting function to the term
@@ -395,6 +401,7 @@
 //     - values are entry dictionaries containing term details
 //   show-term ((content) => content): Optional function to customize term rendering
 //     Default: Returns term content unchanged
+//   term-links (boolean): If terms should be clickable links leading to glossary
 //   body (content): Document content to process
 //
 // Returns:
@@ -406,6 +413,7 @@
 #let init-glossary(
   entries,
   show-term: (term-body) => term-body,
+  term-links: true,
   body
 ) = context {
   // Type checking
@@ -449,7 +457,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), show-term: show-term)
+      __gls(key, modifiers: modifiers.map(lower), show-term: show-term, term-links: term-links)
     } else {
       // Not one of ours, so just pass it through
       r
