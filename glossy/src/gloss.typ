@@ -431,7 +431,7 @@
     __add_entry(key, __normalize_entry(key, entry))
     // Create placeholder labels for autocompletion (if not already present)
     context if not __has_glossary_entry(key) [
-      #metadata("RF")#label(key)
+      #metadata(key)#label(key)
     ]
   }
 
