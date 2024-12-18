@@ -489,6 +489,12 @@
     }
   }
 
+  // Emit all the term labels inside #hide() to help editors with auto-completion
+  for key in checked-entries.keys() {
+    hide[#label(key)]
+  }
+
+  // And then the rest of the document
   body
 }
 
