@@ -1,13 +1,27 @@
 image: alpine/edge
+packages:
+  - git
+
 secrets:
   - 88cce185-d2ec-4573-9546-e33f36f79bbf
-sources:
-  - git+ssh://git@git.sr.ht/~swaits/typst-collection
+
+environment:
+  # repo and user names on both sr.ht and github
+  REPO: typst-collection
+  USER: swaits
+
 tasks:
-  - mirror-to-github: |
-      cd ~/typst-collection
-      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-      # Explicitly fetch all branches & tags
+  - clone: |
+      git clone --origin origin "git+ssh://git@git.sr.ht/~$USER/$REPO"
+
+  - fetch-all-branches: |
+      cd "~/$REPO"
       git fetch origin '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*' --prune
-      git remote add github git@github.com:swaits/typst-collection.git
+
+  - setup-github-remote: |
+      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      git remote add github "git@github.com:$USER/$REPO.git"
+
+  - mirror-to-github: |
+      cd "~/$REPO"
       git push --mirror github
