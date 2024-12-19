@@ -15,8 +15,11 @@ tasks:
       cd "$HOME/$REPO"
       git fetch origin '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*' --prune
 
-  - setup-github-remote: |
+  - get-github-public-key: |
       ssh-keyscan -t rsa github.com >> "$HOME/.ssh/known_hosts"
+
+  - add-github-remote: |
+      cd "$HOME/$REPO"
       git remote add github "git@github.com:$USER/$REPO.git"
 
   - mirror-to-github: |
