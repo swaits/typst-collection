@@ -5,7 +5,6 @@
 #import "./utils.typ": *
 
 #let __gloss_entries = state("__gloss_entries", (:))
-#let __gloss_used = state("__gloss_used", (:))
 
 #let __gloss_label_prefix = "__gloss:"
 
@@ -110,70 +109,56 @@
   entries.at(key)
 }
 
-// Creates a prefixed label string for dictionary entries and term usage.
-//
-// Parameters:
-//   key (string): The glossary entry key
-//
-// Returns:
-//   string: The prefixed label string for dictionary entries
-//
-#let __dict_label_str(key) = {
-  __gloss_label_prefix + key
-}
-
-// Creates a label object for dictionary entries.
-//
-// Parameters:
-//   key (string): The glossary entry key
-//
-// Returns:
-//   label: A Typst label object for the dictionary entry
-//
-#let __dict_label(key) = {
-  label(__dict_label_str(key))
-}
-
-// Creates a prefixed label string for term usage in documents.
-//
-// Parameters:
-//   key (string): The glossary entry key
-//   index (int): The occurrence index of the term in the document
-//
-// Returns:
-//   string: The prefixed label string for term usage
-//
-#let __term_label_str(key, index) = {
-  __gloss_label_prefix + key + "." + str(index)
-}
-
 // Creates a label object for term usage in documents.
 //
 // Parameters:
 //   key (string): The glossary entry key
-//   index (int): The occurrence index of the term in the document
 //
 // Returns:
 //   label: A Typst label object for the term usage
 //
-#let __term_label(key, index) = {
-  label(__term_label_str(key, index))
+#let __term_label(key) = {
+  label(__gloss_label_prefix + key)
 }
 
-// Updates the term usage count in the glossary state.
+// Updates the term usage in the glossary state.
 //
 // Parameters:
 //   key (string): The glossary entry key
-//   count (int): The number of times the term has been used
 //
 // Returns:
 //   none: Updates state as a side effect
 //
-#let __save_term_usage(key, count) = {
-  __gloss_used.update(state => {
-    state.insert(key, count)
-    state
-  })
+#let __mark_term_used(key) = {
+  counter(__gloss_label_prefix + key).step()
+}
+
+// Queries the term usage
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   location (location): The location in the document. Use none for end of document
+//
+// Returns:
+//   boolean: If the entry is used above the location in the document
+//
+#let __is_term_used(key, location: none) = {
+  let c = counter(__gloss_label_prefix + key)
+  c = if location == none {c.final()} else {c.at(location)}
+  c.at(0) > 0
+}
+
+
+// Determine if the glossary contains a visible entry
+//
+// Parameters:
+//   key (string): The glossary entry key
+// 
+// Returns:
+//   boolean: If the term is visible in the glossary (and the label is unique)
+//
+#let __has_glossary_entry(key) = {
+  query(<glossary>).len() > 0 and query(selector(label(key)).after(<glossary>)).len() == 1
 }
 
 // Renders a glossary term with various formatting options.
@@ -189,6 +174,7 @@
 //     - "def" or "desc": Show the term's description instead of its name.
 //     - "a" or "an": Prepend an article, chosen from the entry (short or long form).
 //   show-term (function): A function that renders the chosen term.
+//   term-links (boolean): If terms should be clickable links leading to glossary
 //
 // Behavior:
 //   - Without modifiers, the first use of a term shows "Long form (short form)",
@@ -201,7 +187,7 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, show-term: function) = {
+#let __gls(key, modifiers: array, show-term: function, term-links: true) = {
   // ---------------------------------------------------------------------------
   // Check for illegal modifier combinations
   // ---------------------------------------------------------------------------
@@ -216,7 +202,6 @@
   // Retrieve the glossary entry and its label
   // ---------------------------------------------------------------------------
   let entry = __get_entry(key)
-  let entry_label = __dict_label_str(key)
 
   // ---------------------------------------------------------------------------
   // If "def" or "desc" modifier is present, show the entry's description immediately
@@ -231,15 +216,8 @@
   // ---------------------------------------------------------------------------
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
-  let entry_counter = counter(entry_label)
-  entry_counter.step()
-  let key_index = entry_counter.get().first()
-  let is_first_use = key_index == 0
-
-  // ---------------------------------------------------------------------------
-  // Record another usage of this term (increment the usage counter)
-  // ---------------------------------------------------------------------------
-  __save_term_usage(key, key_index + 1)
+  let is_first_use = not __is_term_used(key, location: here())
+  __mark_term_used(key)
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -366,14 +344,19 @@
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    [#article#show-term(term)#metadata(term)#__term_label(key, key_index)]
+    let text = if term-links and __has_glossary_entry(key) {
+      link(label(key), term) 
+    } else {
+      term
+    }
+    [#article#show-term(text)#metadata(term)#__term_label(key)]
   // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
   // \_art.  |               |              |
   //         \_ apply user formatting function to the term
   //                         |              |
   //                         \_ metadata lets us label (ie it's "labelable")
   //                                        |
-  //                                        \_ i.e. <__gloss.key.0>, etc.
+  //                                        \_ i.e. <__gloss:key>, etc.
   //                                           for backlink from glossary
   }
 }
@@ -386,36 +369,22 @@
 //
 // Parameters:
 //   key (string): The glossary entry key
-//   count (int): Number of times the term appears in the document
 //
 // Returns:
 //   content: Comma-separated list of linked page numbers
 //
 // Example output: "1, 3, 5" where each number links to the term usage on that page
 //
-#let __create_backlinks(key, count) = {
-  // Convert term (key + count) to labels with their displayed page numbers
-  let page_labels = range(count).map(i => {
-    let label = __term_label(key, i)
-    let loc = locate(label)
-    (
-      label,
-      numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
-    )
-  })
-
-  // Filter out repeated page numbers using a regular loop
-  let seen = (:)
-  let singulated = ()
-  for (label, page) in page_labels {
-    if not seen.keys().contains(page) {
-      seen.insert(page, true)
-      singulated.push((label, page))
-    }
-  }
-
-  // Convert resulting set to array of links
-  singulated.map(((label, page)) => link(label, page)).join(", ")
+#let __create_backlinks(key) = {
+  return context query(__term_label(key)) // find all reference
+    .map(meta => { // extract location and page number (or symbol)
+      let loc = meta.location()
+      let page = numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
+      (loc, page)
+    })
+    .dedup(key: ((loc, page)) => page) // deduplicate by page
+    .map(((loc, page)) => link(loc, page)) // create links
+    .join(", ")    
 }
 
 // Initializes the glossary system and sets up term reference handling.
@@ -432,6 +401,7 @@
 //     - values are entry dictionaries containing term details
 //   show-term ((content) => content): Optional function to customize term rendering
 //     Default: Returns term content unchanged
+//   term-links (boolean): If terms should be clickable links leading to glossary
 //   body (content): Document content to process
 //
 // Returns:
@@ -443,6 +413,7 @@
 #let init-glossary(
   entries,
   show-term: (term-body) => term-body,
+  term-links: true,
   body
 ) = context {
   // Type checking
@@ -458,6 +429,10 @@
   // Process and store each glossary entry
   for (key, entry) in entries {
     __add_entry(key, __normalize_entry(key, entry))
+    // Create placeholder labels for autocompletion (if not already present)
+    context if not __has_glossary_entry(key) [
+      #metadata(key)#label(key)
+    ]
   }
 
   // Set up reference handling for glossary terms
@@ -482,7 +457,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), show-term: show-term)
+      __gls(key, modifiers: modifiers.map(lower), show-term: show-term, term-links: term-links)
     } else {
       // Not one of ours, so just pass it through
       r
@@ -542,7 +517,7 @@
   // Collect and organize entries by group
   let output = (:)
   let all_entries = __gloss_entries.final()
-  let all_used = __gloss_used.final()
+  let all_used = all_entries.keys().filter(key => __is_term_used(key))
 
   // Determine which groups to process
   let all_groups = all_entries
@@ -572,52 +547,55 @@
     let current_entries = ()
 
     // Collect all used entries for this group
-    for (key, count) in all_used {
+    for key in all_used {
       let entry = all_entries.at(key)
       if entry.at("group") == group {
         current_entries.push((
           short: entry.at("short"),
           long: entry.at("long"),
           description: entry.at("description"),
-          label: [#metadata(key)#__dict_label(key)],
-          pages: __create_backlinks(key, count)
+          label: [#metadata(key)#label(key)],
+          pages: __create_backlinks(key)
         ))
       }
     }
-
-  // Add non-empty groups to output
-  if current_entries.len() > 0 {
-    group = if group == none { "" } else { group }
-
-    // sort entries by case insensitivity if requested
-    let sorted_entries = current_entries
-      // 1. create array of tuples with (lower [if ignore-case], entry)
-      .map(e => { if ignore-case { (lower(e.short), e) } else { (e.short, e) } })
-      // 2. sort the tuples (by first element then second)
-      .sorted(key: t => t.first())
-      // 3. strip away the tuple's first element, leaving an array of entries
-      .map(t => t.last())
-
-    // add entries to this group's output map
-    output.insert(group, sorted_entries)
+  
+    // Add non-empty groups to output
+    if current_entries.len() > 0 {
+      group = if group == none { "" } else { group }
+  
+      // sort entries by case insensitivity if requested
+      let sorted_entries = current_entries
+        // 1. create array of tuples with (lower [if ignore-case], entry)
+        .map(e => { if ignore-case { (lower(e.short), e) } else { (e.short, e) } })
+        // 2. sort the tuples (by first element then second)
+        .sorted(key: t => t.first())
+        // 3. strip away the tuple's first element, leaving an array of entries
+        .map(t => t.last())
+  
+      // add entries to this group's output map
+      output.insert(group, sorted_entries)
+    }
   }
-}
 
   // Render the glossary using the theme
   let group_index = 0
 
-  (checked-theme.section)(
-    title,
-    for (group, entries) in output {
-      (checked-theme.group)(
-        group,
-        group_index,
-        output.len(),
-        for (i, entry) in entries.enumerate() {
-          (checked-theme.entry)(entry, i, entries.len())
-        }
-      )
-      group_index += 1
-    }
-  )
+  [
+    #metadata("glossary")<glossary>
+    #(checked-theme.section)(
+      title,
+      for (group, entries) in output {
+        (checked-theme.group)(
+          group,
+          group_index,
+          output.len(),
+          for (i, entry) in entries.enumerate() {
+            (checked-theme.entry)(entry, i, entries.len())
+          }
+        )
+        group_index += 1
+      }
+    )
+  ]
 }
