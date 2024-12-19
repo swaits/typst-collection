@@ -12,13 +12,13 @@ environment:
 
 tasks:
   - fetch-all-branches: |
-      cd "~/$REPO"
+      cd "$HOME/$REPO"
       git fetch origin '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*' --prune
 
   - setup-github-remote: |
-      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      ssh-keyscan -t rsa github.com >> "$HOME/.ssh/known_hosts"
       git remote add github "git@github.com:$USER/$REPO.git"
 
   - mirror-to-github: |
-      cd "~/$REPO"
+      cd "$HOME/$REPO"
       git push --mirror github
