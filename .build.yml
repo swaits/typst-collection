@@ -11,9 +11,6 @@ environment:
   USER: swaits
 
 tasks:
-  - clone: |
-      git clone --origin origin "git+ssh://git@git.sr.ht/~$USER/$REPO"
-
   - fetch-all-branches: |
       cd "~/$REPO"
       git fetch origin '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*' --prune
