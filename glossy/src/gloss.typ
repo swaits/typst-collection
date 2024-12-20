@@ -540,7 +540,7 @@
 //
 #let glossary(
   title: "Glossary",
-  theme: theme-twocol,
+  theme: theme-academic,
   ignore-case: false,
   groups: (),
 ) = context {
