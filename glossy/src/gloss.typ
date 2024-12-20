@@ -23,7 +23,7 @@
 // Returns:
 //   dictionary: Normalized dictionary with all expected keys populated
 //
-// Throws:
+// Panics:
 //   - If 'short' key is missing when using normal (non-abbreviated) syntax
 //   - If 'short' value is not a string
 //   - If 'short' value is an empty string
@@ -97,7 +97,7 @@
 // Returns:
 //   dictionary: The glossary entry associated with the key
 //
-// Throws:
+// Panics:
 //   - If the key does not exist in the glossary
 //
 #let __get_entry(key) = {
@@ -187,7 +187,7 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, show-term: function, term-links: true) = {
+#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true) = {
   // ---------------------------------------------------------------------------
   // Check for illegal modifier combinations
   // ---------------------------------------------------------------------------
@@ -245,27 +245,6 @@
     } else {
       // Article is present; capitalize its first letter instead.
       (upper(article.first()) + article.slice(1), term)
-    }
-  }
-
-  // get_term(mode): Returns the appropriate term string based on the mode.
-  // mode is one of "short", "long", or "both".
-  //   - "short": Returns the short form.
-  //   - "long": Returns the long form.
-  //   - "both": Returns "Long form (short form)".
-  // We rely on prior logic to ensure that when mode = "both" or "long", a long form is available.
-  let get_term = (mode) => {
-    let short_form = pluralize_term(entry.short, entry.plural)
-    let long_form = pluralize_term(entry.long, entry.longplural) // none safe here
-    if mode == "short" {
-      // Just the short form.
-      short_form
-    } else if mode == "long" {
-      // Just the long form.
-      long_form
-    } else {
-      // mode == "both": "Long form (short form)".
-      long_form + " (" + short_form + ")"
     }
   }
 
@@ -337,19 +316,33 @@
   // Determine mode using the helper function
   let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available)
 
-  // Get the article and term for the chosen mode, then apply capitalization if requested
-  let (article, term) = capitalize_term(get_article(mode), get_term(mode))
+  // Pluralize (if requested)
+  let short-form = pluralize_term(entry.short, entry.plural)
+  let long-form = pluralize_term(entry.long, entry.longplural) // `none` safe here
+
+  // Apply format-term() to get the term
+  let formatted-term = format-term(mode, short-form, long-form)
+  if type(formatted-term) != "string" {
+    // This is because we still need to capitalize the term, and we cannot do
+    // that with content, thus requiring a string here.
+    // TODO: consider if we want to capitalize *before* this. First intuition is
+    // "no".
+    panic("Your cutsom format-term() function must return a string.")
+  }
+
+  // Get the article, then capitalize either the article or term (if requested)
+  let (article, term) = capitalize_term(get_article(mode), formatted-term)
 
   // ---------------------------------------------------------------------------
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    let text = if term-links and __has_glossary_entry(key) {
+    let linked-term = if term-links and __has_glossary_entry(key) {
       link(label(key), term)
     } else {
       term
     }
-    [#article#show-term(text)#metadata(term)#__term_label(key)]
+    [#article#show-term(linked-term)#metadata(term)#__term_label(key)]
   // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
   // \_art.  |               |              |
   //         \_ apply user formatting function to the term
@@ -387,6 +380,47 @@
     .join(", ")
 }
 
+// Formats a term string based on the specified mode.
+//
+// Given mode, long-form, and short-form, this function returns the formatted
+// term based on the mode. When mode is ...
+//
+// - "short" -> returns "short-form"
+// - "long" -> returns "long-form"
+// - "both" -> returns "short-form (long-form)"
+//
+// Parameters:
+//   mode (string): The mode in which to format the term. Possible values are "short", "long", or "both".
+//   short-form (string): The short form of the term.
+//   long-form (string): The long form of the term.
+//
+// Returns:
+//   string: The formatted term based on the specified mode.
+//
+#let __default-format-term(mode, short-form, long-form) = {
+    if mode == "short" {
+      short-form
+    } else if mode == "long" {
+      long-form
+    } else {
+      // mode assumed to be "both"
+      long-form + " (" + short-form + ")"
+    }
+}
+
+// Styles a term to control its display in a document.
+//
+// Parameters:
+//   term-body (content'ish): the unstyled output from __gls()
+//
+// Returns:
+//   content: display ready content (assumed based on `term-body`)
+//
+#let __default-show-term(term-body) = {
+  // Default: just render it like normal text
+  term-body
+}
+
 // Initializes the glossary system and sets up term reference handling.
 //
 // This function is typically used with `#show: init-glossary`. It performs
@@ -407,12 +441,13 @@
 // Returns:
 //   content: Processed document content with glossary functionality enabled
 //
-// Throws:
+// Panics:
 //   - If entries parameter is not a dictionary
 //
 #let init-glossary(
   entries,
-  show-term: (term-body) => term-body,
+  format-term: __default-format-term,
+  show-term: __default-show-term,
   term-links: true,
   body
 ) = context {
@@ -423,6 +458,7 @@
     let checked-entry = z.parse(entry, dict-schema, scope: ("dictionary entry",))
     checked-entries.insert(checked-key, checked-entry)
   }
+  let checked-format-term = z.parse(show-term, z.function(), scope: ("format-term",))
   let checked-show-term = z.parse(show-term, z.function(), scope: ("show-term",))
   let checked-body = z.parse(body, z.content(), scope: ("body",))
 
@@ -457,7 +493,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), show-term: show-term, term-links: term-links)
+      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links)
     } else {
       // Not one of ours, so just pass it through
       r
@@ -499,7 +535,7 @@
 // Returns:
 //   content: Formatted glossary content
 //
-// Throws:
+// Panics:
 //   - If a requested group doesn't exist
 //
 #let glossary(
