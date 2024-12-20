@@ -203,7 +203,7 @@
 
   if is_acronym {
     // Use acronym rules
-    let first_char = upper_word.slice(0,1)
+    let first_char = upper_word.codepoints().slice(0,1).first()
     if acronym_vowels.contains(first_char) {
       "an"
     } else {
@@ -211,7 +211,7 @@
     }
   } else {
     // Non-acronym rules
-    let first_char = lower_word.slice(0,1)
+    let first_char = lower_word.codepoints().slice(0,1).first()
 
     // Special cases for words matching a set of known 'silent h' prefixes
     let silent_h_words = (
