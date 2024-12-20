@@ -153,7 +153,7 @@
 //
 // Parameters:
 //   key (string): The glossary entry key
-// 
+//
 // Returns:
 //   boolean: If the term is visible in the glossary (and the label is unique)
 //
@@ -345,7 +345,7 @@
   // ---------------------------------------------------------------------------
   context {
     let text = if term-links and __has_glossary_entry(key) {
-      link(label(key), term) 
+      link(label(key), term)
     } else {
       term
     }
@@ -384,7 +384,7 @@
     })
     .dedup(key: ((loc, page)) => page) // deduplicate by page
     .map(((loc, page)) => link(loc, page)) // create links
-    .join(", ")    
+    .join(", ")
 }
 
 // Initializes the glossary system and sets up term reference handling.
@@ -559,11 +559,11 @@
         ))
       }
     }
-  
+
     // Add non-empty groups to output
     if current_entries.len() > 0 {
       group = if group == none { "" } else { group }
-  
+
       // sort entries by case insensitivity if requested
       let sorted_entries = current_entries
         // 1. create array of tuples with (lower [if ignore-case], entry)
@@ -572,7 +572,7 @@
         .sorted(key: t => t.first())
         // 3. strip away the tuple's first element, leaving an array of entries
         .map(t => t.last())
-  
+
       // add entries to this group's output map
       output.insert(group, sorted_entries)
     }
