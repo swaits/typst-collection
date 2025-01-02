@@ -80,6 +80,7 @@
       kt:          (name: "Kotlin",           color: rgb("#5e3cc2"), icon: __icon("kotlin.svg")),
     latex:         (name: "LaTeX",            color: rgb("#000000"), icon: __icon("latex.svg")),
     less:          (name: "Less",             color: rgb("#2a4d80"), icon: __icon("less.svg")),
+    lisp:          (name: "Lisp",             color: rgb("#3FBF3F"), icon: __icon("lisp.svg")),
     lua:           (name: "Lua",              color: rgb("#000080"), icon: __icon("lua.svg")),
     markdown:      (name: "Markdown",         color: rgb("#000000"), icon: __icon("markdown.svg")),
     matlab:        (name: "Matlab",           color: rgb("#4499dd"), icon: __icon("matlab.svg")),
