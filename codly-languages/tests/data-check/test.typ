@@ -42,6 +42,7 @@
   "kotlin",
   "latex",
   "less",
+  "lisp",
   "lua",
   "markdown",
   "matlab",

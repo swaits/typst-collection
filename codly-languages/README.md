@@ -50,7 +50,6 @@ The following languages are still missing. All contributions welcome.
 - Jinja2
 - Jsonnet
 - Lean
-- Lisp
 - LiveScript
 - Makefile
 - MediaWiki
@@ -92,6 +91,11 @@ The following languages are still missing. All contributions welcome.
 
 The `typst-small.png` icon included in this package came from the MIT-licensed
 [codly](https://github.com/Dherse/codly) project.
+
+The `lisp.svg` icon comes [from
+Wikipedia](https://commons.wikimedia.org/wiki/File:Lisp_logo.svg), attribution:
+Jooja, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via
+Wikimedia Commons.
 
 All other icons included here came from the MIT-licensed
 [devicon](https://github.com/devicons/devicon/) project.
