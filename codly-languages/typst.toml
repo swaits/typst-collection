@@ -1,6 +1,6 @@
 [package]
 name = "codly-languages"
-version = "0.1.3"
+version = "0.1.4"
 entrypoint = "lib.typ"
 authors = ["Stephen Waits <steve@waits.net>"]
 license = "MIT"
