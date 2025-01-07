@@ -17,6 +17,9 @@ links below to their main page.
   into everyday docs.
 - [**swank-tex**](https://typst.app/universe/package/swank-tex): Render those
   funky logos for TeX, LaTeX, and friends.
+- [**tasteful-pairings**](https://typst.app/universe/package/tasteful-pairings):
+  A carefully curated collection of font pairings focusing on readability and
+  typographic harmony.
 
 ## Templates
 
