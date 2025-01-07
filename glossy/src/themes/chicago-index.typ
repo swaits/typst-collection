@@ -37,7 +37,7 @@
           grid(
             columns: (1fr, auto),
             gutter: 1em,
-            [#short-display#entry.label#long-display#description],
+            [#short-display#entry.label#long-display#description#entry.label],
             [#entry.pages]
           )
         }
