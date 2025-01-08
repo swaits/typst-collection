@@ -93,6 +93,9 @@ The following languages are still missing. All contributions welcome.
 The `typst-small.png` icon included in this package came from the MIT-licensed
 [codly](https://github.com/Dherse/codly) project.
 
+The `cuda.svg` icon included in this package came from the MIT-licensed
+[vscode-icons](https://github.com/vscode-icons/vscode-icons) project.
+
 All other icons included here came from the MIT-licensed
 [devicon](https://github.com/devicons/devicon/) project.
 
