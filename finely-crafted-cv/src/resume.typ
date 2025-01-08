@@ -32,6 +32,7 @@
     header: context {
       if here().page() == 1 {
         text(
+          font: heading-font,
           size: HEADER_SIZE,
           grid(
             columns: (1fr, auto, auto, auto, auto, auto),
@@ -79,12 +80,16 @@
     block(
       above: SECTION_HEADING_SPACE_ABOVE,
       below: SECTION_HEADING_SPACE_BELOW,
+      fill: SECTION_HEADING_BLOCK_FILL,
+      radius: SECTION_HEADING_BLOCK_RADIUS,
+      outset: SECTION_HEADING_BLOCK_OUTSET,
       breakable: false,
       [
         #text(size: SECTION_HEADING_SIZE, weight: SECTION_HEADING_WEIGHT, font: heading-font)[
           #context counter(heading).display()
-          #upper(it.body)
+          #smallcaps(it.body)
         ]
+        #v(-0.25em)
         #hrule(stroke: SECTION_HEADING_HRULE_STROKE)
       ]
     )
@@ -103,6 +108,7 @@
       }
     },
   )
+  show table.cell.where(y: 0): set text(font: heading-font)
 
   // Save our settings needed in other functions
   __set("heading-font", heading-font)
@@ -173,6 +179,12 @@
 #let school-heading = company-heading
 
 #let job-heading(title, location: none, start: none, end: none, comment: none, body) = {
+  // if we have an empty body, we need to nudge this up
+  let the-body = if repr(body) == "[]" {
+    v(EMPTY_JOB_NUDGE)
+  } else {
+    body
+  }
   block(
     above: JOB_BLOCK_ABOVE,
     below: JOB_BLOCK_BELOW,
@@ -218,7 +230,7 @@
         }
       ),
 
-      grid.cell(colspan: 5, body)
+      grid.cell(colspan: 5, the-body)
     )
   )
 }

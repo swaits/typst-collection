@@ -15,7 +15,7 @@ education, experience, skills, and more.
 To use this template, import it with the version number and utilize the `resume` or `cv` function:
 
 ```typst
-#import "@preview/finely-crafted-cv:0.1.0": *
+#import "@preview/finely-crafted-cv:0.2.0": *
 
 #show: resume.with(
   name: "Amira Patel",
