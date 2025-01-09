@@ -1,10 +1,12 @@
 #import "constants.typ": *
 
 /// The main function for easy typography setup.
-/// - body-size: The size of body text (default 10pt).
-/// - fonts: A dictionary specifying heading/body fonts.
-/// - paper: The paper size to use (none to skip).
-/// - margin: Margin for the page (none to skip).
+///
+/// - body-size (): The size of body text (default 10pt).
+/// - fonts (): A dictionary specifying heading/body fonts.
+/// - paper (str): The paper size to use (none to skip).
+/// - margin (): Margin for the page (none to skip).
+/// -> content
 #let easy-typography(
   body-size: 10pt,
   fonts: (heading: "Libertinus Sans", body: "Libertinus Serif"),
@@ -43,12 +45,20 @@
     hyphenate: true,
     kerning: true,
     ligatures: true,
-    number-type: "lining",
+    number-width: "proportional",
+    // number-type: "lining", // commented: intentionally left up to the font to choose
   )
 
-  // Top-heavy easing function for heading sizes/spacing:
-  //    - max = biggest size (H1), min = smallest size (H5), level in [1..5]
-  //    - sqrt(t) => gives biggest decrease at top, gentlest at bottom
+  show table: set text(number-width: "tabular")
+
+  /// Top-heavy easing function for heading sizes/spacing.
+  ///
+  /// `sqrt(t)` gives biggest decrease at top, gentlest at bottom.
+  ///
+  /// - max (length): Biggest size (H1)
+  /// - min (length): Smallest size (H5)
+  /// - level (length): From 1 to 5
+  /// -> length
   let compute-size(max, min, level) = {
     if level <= 1 {
       max
