@@ -40,7 +40,7 @@
           grid(
             columns: (1fr, auto),
             gutter: 0.75em,
-            [#short-display#long-display#description],
+            [#short-display#long-display#description#entry.label],
             text(fill: rgb("#666666"), entry.pages)
           )
         }

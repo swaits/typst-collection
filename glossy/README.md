@@ -41,7 +41,7 @@ different goals:
 ### Import the package
 
 ```typst
-#import "@preview/glossy:0.5.1": *
+#import "@preview/glossy:0.5.2": *
 ```
 
 ### Defining Glossary Terms
@@ -253,7 +253,7 @@ Customize glossary appearance by defining a theme with three functions:
   // Individual glossary entry
   entry: (entry, index, total) => {
     // index = entry index, total = total entries in group
-    let output = [#entry.short]
+    let output = [#entry.short#entry.label] // **NOTE:** Label here!
     if entry.long != none {
       output = [#output -- #entry.long]
     }
@@ -279,6 +279,9 @@ Entry fields available to themes:
 - `description`: Term description (can be `none`)
 - `label`: Term's dictionary label
 - `pages`: Linked page numbers where term appears
+
+**NOTE:** If the theme does not emit `entry.label`, linking form terms to their
+glossary entry will not work.
 
 ## License
 
