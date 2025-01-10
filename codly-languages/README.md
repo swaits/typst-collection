@@ -24,85 +24,32 @@ languages, should look like this:
 
 ## Contributing
 
-The following languages are still missing. All contributions welcome.
-
-- ASP
-- ActionScript
-- Ada
-- AppleScript
-- AsciiDoc
-- Batch File
-- CFML
-- CSV
-- Cabal
-- Crontab
-- D
-- Diff
-- DotENV
-- Email
-- Fish
-- Fstab
-- GLSL
-- Graphviz
-- Groff
-- Group
-- INI
-- Jinja2
-- Jsonnet
-- Lean
-- LiveScript
-- Makefile
-- MediaWiki
-- NSIS
-- Ninja
-- Org mode
-- Pascal
-- Passwd
-- Protobuf
-- Puppet
-- QML
-- Racket
-- Rego
-- Regular Expressions
-- Resolv
-- RestructuredText
-- Robot
-- SLS
-- SML
-- Slim
-- Strace
-- SublimeEthereum
-- SublimeJQ
-- SystemVerilo
-- TCL
-- TOML
-- Textile
-- TodoTxt
-- Verilog
-- WGSL
-- cmd-help
-- gnuplot
-- hosts
-- http-request-response
-- varlink
-- vscode-wgsl
+Some languages are still missing. All contributions welcome.
 
 ## Icon Attribution
 
-The `typst-small.png` icon included in this package came from the MIT-licensed
-[codly](https://github.com/Dherse/codly) project.
+| **Icon**          | **Source**                               | **License**                  |
+| ----------------- | ---------------------------------------- | ---------------------------- |
+| `css3.svg`        | [CSS-Next/logo.css][css3-source]         | [CC0][css3-license]          |
+| `cuda.svg`        | [vscode-icons/vscode-icons][cuda-source] | [MIT][cuda-license]          |
+| `lisp.svg`        | [Wikipedia (User:Jooja)][lisp-source]    | [CC BY-SA 4.0][lisp-license] |
+| `typst-small.png` | [Dherse/codly][typst-source]             | [MIT][typst-license]         |
 
-The `lisp.svg` icon comes [from
-Wikipedia](https://commons.wikimedia.org/wiki/File:Lisp_logo.svg), attribution:
-Jooja, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via
-Wikimedia Commons.
+[css3-source]: https://github.com/CSS-Next/logo.css/blob/main/css.svg?short_path=c59d4da
+[css3-license]: https://github.com/CSS-Next/logo.css/blob/main/LICENSE
+[cuda-source]: https://github.com/vscode-icons/vscode-icons/tree/master
+[cuda-license]: https://github.com/vscode-icons/vscode-icons/blob/master/LICENSE
+[lisp-source]: https://commons.wikimedia.org/wiki/File:Lisp_logo.svg
+[lisp-license]: https://commons.wikimedia.org/wiki/File:Lisp_logo.svg#Licensing
+[typst-source]: https://github.com/Dherse/codly
+[typst-license]: https://github.com/Dherse/codly/blob/main/LICENSE
 
-The `cuda.svg` icon included in this package came from the MIT-licensed
-[vscode-icons](https://github.com/vscode-icons/vscode-icons) project.
+All icons not listed in this table come from the
+[devicons/devicon][default-source] project, [MIT licensed][default-license].
 
-All other icons included here came from the MIT-licensed
-[devicon](https://github.com/devicons/devicon/) project.
+[default-source]: https://github.com/devicons/devicon/
+[default-license]: https://github.com/devicons/devicon/blob/master/LICENSE
 
 ## License
 
-This package is released under the MIT License.
+This package is released under the [MIT License](LICENSE).
