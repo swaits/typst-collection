@@ -7,6 +7,7 @@
 #let __gloss_entries = state("__gloss_entries", (:))
 
 #let __gloss_label_prefix = "__gloss:"
+#let __gloss_first_use_counter_postfix = ":first-use-count"
 
 // Normalizes a dictionary entry by ensuring all required and optional keys exist
 // with appropriate default values.
@@ -129,11 +130,14 @@
 // Returns:
 //   none: Updates state as a side effect
 //
-#let __mark_term_used(key) = {
+#let __mark_term_used(key, count-as-first-use) = {
   counter(__gloss_label_prefix + key).step()
+  if count-as-first-use {
+    counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).step()
+  }
 }
 
-// Queries the term usage
+// Queries whether the term is used ANYWHERE
 //
 // Parameters:
 //   key (string): The glossary entry key
@@ -142,12 +146,29 @@
 // Returns:
 //   boolean: If the entry is used above the location in the document
 //
-#let __is_term_used(key, location: none) = {
+#let __is_term_ever_used(key, location: none) = {
   let c = counter(__gloss_label_prefix + key)
   c = if location == none {c.final()} else {c.at(location)}
   c.at(0) > 0
 }
 
+// Queries whether the term has been "first used"
+//
+// "First used" is used to determine how to display the term, either "long
+// (short)" or just "(short)"
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   location (location): The location in the document. Use none for end of document
+//
+// Returns:
+//   boolean: If the entry is used above the location in the document
+//
+#let __is_term_first_used(key, location: none) = {
+  let c = counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix)
+  c = if location == none {c.final()} else {c.at(location)}
+  c.at(0) > 0
+}
 
 // Determine if the glossary contains a visible entry
 //
@@ -216,8 +237,9 @@
   // ---------------------------------------------------------------------------
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
-  let is_first_use = not __is_term_used(key, location: here())
-  __mark_term_used(key)
+  let is_first_use = not __is_term_first_used(key, location: here())
+  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
+  __mark_term_used(key, count-as-first-use)
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -554,7 +576,7 @@
   // Collect and organize entries by group
   let output = (:)
   let all_entries = __gloss_entries.final()
-  let all_used = all_entries.keys().filter(key => __is_term_used(key))
+  let all_used = all_entries.keys().filter(key => __is_term_ever_used(key))
 
   // Determine which groups to process
   let all_groups = all_entries
