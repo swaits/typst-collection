@@ -126,6 +126,8 @@
       shell:       (name: "Shell",            color: rgb("#293138"), icon: __icon("bash.svg")),
     solidity:      (name: "Solidity",         color: rgb("#000000"), icon: __icon("solidity.svg")),
       sol:         (name: "Solidity",         color: rgb("#000000"), icon: __icon("solidity.svg")),
+    splunk:        (name: "Splunk",           color: rgb("#76a445"), icon: __icon("splunk.svg")),
+      spl:         (name: "Splunk",           color: rgb("#76a445"), icon: __icon("splunk.svg")),
     sql:           (name: "SQL",              color: rgb("#f2f2f2"), icon: __icon("sql.svg")),
     sqlite:        (name: "SQLite",           color: rgb("#0b7fcc"), icon: __icon("sqlite.svg")),
     ssh-config:    (name: "SSH",              color: rgb("#231f20"), icon: __icon("ssh.svg")),
@@ -157,7 +159,5 @@
     yaml:          (name: "YAML",             color: rgb("#cb171e"), icon: __icon("yaml.svg")),
       yml:         (name: "YAML",             color: rgb("#cb171e"), icon: __icon("yaml.svg")),
     zig:           (name: "Zig",              color: rgb("#f7a41d"), icon: __icon("zig.svg")),
-    splunk:        (name: "Splunk",           color: rgb(118, 164, 69), icon: __icon("splunk.svg")),
-      spl:         (name: "Splunk",           color: rgb(118, 164, 69), icon: __icon("splunk.svg"))
   )
 }
