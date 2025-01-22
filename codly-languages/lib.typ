@@ -87,6 +87,7 @@
     markdown:      (name: "Markdown",         color: rgb("#000000"), icon: __icon("markdown.svg")),
     matlab:        (name: "Matlab",           color: rgb("#4499dd"), icon: __icon("matlab.svg")),
     mysql:         (name: "MySQL",            color: rgb("#00618a"), icon: __icon("mysql.svg")),
+    nextflow:      (name: "Nextflow",         color: rgb("#0dc09d"), icon: __icon("nextflow.svg")),
     neovim:        (name: "Neovim",           color: rgb("#517d37"), icon: __icon("neovim.svg")),
       nvim:        (name: "Neovim",           color: rgb("#517d37"), icon: __icon("neovim.svg")),
     nginx:         (name: "Nginx",            color: rgb("#009900"), icon: __icon("nginx.svg")),
