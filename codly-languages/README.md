@@ -28,13 +28,14 @@ Some languages are still missing. All contributions welcome.
 
 ## Icon Attribution
 
-| **Icon**          | **Source**                               | **License**                      |
-| ----------------- | ---------------------------------------- | ---------------------------------|
-| `css3.svg`        | [CSS-Next/logo.css][css3-source]         | [CC0][css3-license]              |
-| `cuda.svg`        | [vscode-icons/vscode-icons][cuda-source] | [MIT][cuda-license]              |
-| `lisp.svg`        | [Wikipedia (User:Jooja)][lisp-source]    | [CC BY-SA 4.0][lisp-license]     |
-| `nextflow.svg`    | [nextflow-io/trademark][nextflow-source] | [CC BY-SA 4.0][nextflow-license] |
-| `typst-small.png` | [Dherse/codly][typst-source]             | [MIT][typst-license]             |
+| **Icon**          | **Source**                                    | **License**                      |
+| ----------------- | --------------------------------------------- | -------------------------------- |
+| `css3.svg`        | [CSS-Next/logo.css][css3-source]              | [CC0][css3-license]              |
+| `cuda.svg`        | [vscode-icons/vscode-icons][cuda-source]      | [MIT][cuda-license]              |
+| `lisp.svg`        | [Wikipedia (User:Jooja)][lisp-source]         | [CC BY-SA 4.0][lisp-license]     |
+| `nextflow.svg`    | [nextflow-io/trademark][nextflow-source]      | [Limited Use][nextflow-license]  |
+| `splunk.svg`      | [denali-design/denali-icons][splunk-source]   | [MIT][splunk-license]            |
+| `typst-small.png` | [Dherse/codly][typst-source]                  | [MIT][typst-license]             |
 
 [css3-source]: https://github.com/CSS-Next/logo.css/blob/main/css.svg?short_path=c59d4da
 [css3-license]: https://github.com/CSS-Next/logo.css/blob/main/LICENSE
@@ -42,7 +43,10 @@ Some languages are still missing. All contributions welcome.
 [cuda-license]: https://github.com/vscode-icons/vscode-icons/blob/master/LICENSE
 [lisp-source]: https://commons.wikimedia.org/wiki/File:Lisp_logo.svg
 [lisp-license]: https://commons.wikimedia.org/wiki/File:Lisp_logo.svg#Licensing
-[nextflow-license]: https://github.com/nextflow-io/trademark
+[nextflow-source]: https://github.com/nextflow-io/trademark
+[nextflow-license]: https://github.com/nextflow-io/trademark/blob/master/README.md
+[splunk-source]: https://github.com/denali-design/denali-icons/blob/master/svg/splunk.svg
+[splunk-license]: https://github.com/denali-design/denali-icons/blob/master/LICENSE.md
 [typst-source]: https://github.com/Dherse/codly
 [typst-license]: https://github.com/Dherse/codly/blob/main/LICENSE
 

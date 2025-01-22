@@ -157,5 +157,7 @@
     yaml:          (name: "YAML",             color: rgb("#cb171e"), icon: __icon("yaml.svg")),
       yml:         (name: "YAML",             color: rgb("#cb171e"), icon: __icon("yaml.svg")),
     zig:           (name: "Zig",              color: rgb("#f7a41d"), icon: __icon("zig.svg")),
+    splunk:        (name: "Splunk",           color: rgb(118, 164, 69), icon: __icon("splunk.svg")),
+      spl:         (name: "Splunk",           color: rgb(118, 164, 69), icon: __icon("splunk.svg"))
   )
 }
