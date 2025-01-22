@@ -49,6 +49,7 @@
   "matlab",
   "mysql",
   "neovim",
+  "nextflow",
   "nginx",
   "nim",
   "nix",
