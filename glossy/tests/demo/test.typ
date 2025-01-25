@@ -47,6 +47,8 @@ Now make sure I get @tps:a:SHORT report by 2pm! @an:tps:cap is very important!!!
   [`@tps:both:pl:cap`], [@tps:both:pl:cap],
   [`@tps:def`        ], [@tps:def],
   [`@tps:desc`       ], [@tps:desc],
+  [`@tps:noref`      ], [@tps:noref *(not listed in glossary)*],
+  [`@tps:noindex`    ], [@tps:noindex *(not listed in glossary)*],
 )
 
 == Adding articles via `a`/`an` modifiers
