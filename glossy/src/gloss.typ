@@ -239,7 +239,10 @@
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
   let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
-  __mark_term_used(key, count-as-first-use)
+  let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
+  if wants_reference {
+    __mark_term_used(key, count-as-first-use)
+  }
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -364,15 +367,20 @@
     } else {
       term
     }
-    [#article#show-term(linked-term)#metadata(term)#__term_label(key)]
-  // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
-  // \_art.  |               |              |
+  let term-label = if wants_reference {
+      __term_label(key)
+    } else {
+      []
+    }
+    [#article#show-term(linked-term)#metadata(term)#term-label]
+  // |^^^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^^^
+  // \_art.  |                      |              |
   //         \_ apply user formatting function to the term
-  //                         |              |
-  //                         \_ metadata lets us label (ie it's "labelable")
-  //                                        |
-  //                                        \_ i.e. <__gloss:key>, etc.
-  //                                           for backlink from glossary
+  //                                |              |
+  //                                \_ metadata lets us label (ie makes it "labelable")
+  //                                               |
+  //                                               \_ i.e. <__gloss:key>, etc.
+  //                                                  for backlink from glossary
   }
 }
 
