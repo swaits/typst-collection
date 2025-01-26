@@ -4,11 +4,6 @@
   name: "Amira Patel",
   tagline: "Innovative marine biologist with 15+ years of experience in ocean conservation and research.",
   keywords: "marine biology, conservation, research, education, patents",
-  icon-contact-header: (
-    (image("icons/email.svg"),    link("mailto:amira.patel@oceandreams.org", "amira.patel@oceandreams.org")),
-    (image("icons/phone.svg"),    link("tel:+13055557890", "+1-305-555-7890")),
-    (image("icons/linkedin.svg"), link("https://www.linkedin.com/in/amirapatel/", "amirapatel")),
-  ),
   thumbnail: image("assets/my-qr-code.svg"),
 )
 

@@ -21,9 +21,11 @@ To use this template, import it with the version number and utilize the `resume`
   name: "Amira Patel",
   tagline: "Innovative marine biologist with 15+ years of experience in ocean conservation and research.",
   keywords: "marine biology, conservation, research, education, patents",
-  email: "amira.patel@oceandreams.org",
-  phone: "+1-305-555-7890",
-  linkedin-username: "amirapatel",
+  icon-contact-header: (
+    (image("icons/email.svg"),    link("mailto:amira.patel@oceandreams.org", "amira.patel@oceandreams.org")),
+    (image("icons/phone.svg"),    link("tel:+13055557890", "+1-305-555-7890")),
+    (image("icons/linkedin.svg"), link("https://www.linkedin.com/in/amirapatel/", "amirapatel")),
+  ),
   thumbnail: image("assets/my-qr-code.svg"),
 )
 
@@ -75,9 +77,8 @@ This is the main function to create a CV document.
   - `heading-font`: (Font) Font for headings, customizable.
   - `body-font`: (Font) Font for body text, customizable.
   - `body-size`: (Size) Font size for body text.
-  - `email`: (String) Your email address.
-  - `phone`: (String) Your phone number.
-  - `linkedin-username`: (String) Your LinkedIn username.
+  - `icon-contact-header`: (Array of Tuples) Array of (icon, content) pairs
+    which will make up the contact header (top of first page).
   - `keywords`: (String) Keywords for searchability.
   - `thumbnail`: (Image) Thumbnail or QR code image, optional.
   - `body`: (Block) The main content of your CV.

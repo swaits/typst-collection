@@ -10,9 +10,7 @@
   heading-font: HEADING_FONT,
   body-font: BODY_FONT,
   body-size: BODY_SIZE,
-  email: none,
-  phone: none,
-  linkedin-username: none,
+  icon-contact-header: none,
   keywords: "",
   thumbnail: none, // check out https://qrframe.kylezhe.ng/ for QR code generation
   body
@@ -30,19 +28,13 @@
     margin: PAGE_MARGIN,
     numbering: "1 / 1",
     header: context {
-      if here().page() == 1 {
-        text(
-          size: HEADER_SIZE,
-          grid(
-            columns: (1fr, auto, auto, auto, auto, auto),
-            gutter: 1em,
-            align: center+horizon,
-            "",
-            icon_and_contact("icons/email.svg", link("mailto:" + email, email)),
-            sym.divides,
-            icon_and_contact("icons/phone.svg", link("tel:" + phone, phone)),
-            sym.divides,
-            icon_and_contact("icons/linkedin.svg", link("https://www.linkedin.com/in/" + linkedin-username, linkedin-username))
+      if here().page() == 1 and icon-contact-header != none {
+        grid(
+          columns: (1fr, auto),
+          [],
+          text(
+            size: HEADER_SIZE,
+            make-icon-header(icon-contact-header)
           )
         )
       }
