@@ -7,6 +7,7 @@
 #let __gloss_entries = state("__gloss_entries", (:))
 
 #let __gloss_label_prefix = "__gloss:"
+#let __gloss_first_use_counter_postfix = ":first-use-count"
 
 // Normalizes a dictionary entry by ensuring all required and optional keys exist
 // with appropriate default values.
@@ -129,11 +130,14 @@
 // Returns:
 //   none: Updates state as a side effect
 //
-#let __mark_term_used(key) = {
+#let __mark_term_used(key, count-as-first-use) = {
   counter(__gloss_label_prefix + key).step()
+  if count-as-first-use {
+    counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).step()
+  }
 }
 
-// Queries the term usage
+// Queries whether the term is used ANYWHERE
 //
 // Parameters:
 //   key (string): The glossary entry key
@@ -142,12 +146,29 @@
 // Returns:
 //   boolean: If the entry is used above the location in the document
 //
-#let __is_term_used(key, location: none) = {
+#let __is_term_ever_used(key, location: none) = {
   let c = counter(__gloss_label_prefix + key)
   c = if location == none {c.final()} else {c.at(location)}
   c.at(0) > 0
 }
 
+// Queries whether the term has been "first used"
+//
+// "First used" is used to determine how to display the term, either "long
+// (short)" or just "(short)"
+//
+// Parameters:
+//   key (string): The glossary entry key
+//   location (location): The location in the document. Use none for end of document
+//
+// Returns:
+//   boolean: If the entry is used above the location in the document
+//
+#let __is_term_first_used(key, location: none) = {
+  let c = counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix)
+  c = if location == none {c.final()} else {c.at(location)}
+  c.at(0) > 0
+}
 
 // Determine if the glossary contains a visible entry
 //
@@ -216,8 +237,12 @@
   // ---------------------------------------------------------------------------
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
-  let is_first_use = not __is_term_used(key, location: here())
-  __mark_term_used(key)
+  let is_first_use = not __is_term_first_used(key, location: here())
+  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
+  let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
+  if wants_reference {
+    __mark_term_used(key, count-as-first-use)
+  }
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -342,15 +367,20 @@
     } else {
       term
     }
-    [#article#show-term(linked-term)#metadata(term)#__term_label(key)]
-  // |^^^^^^^|^^^^^^^^^      |^^^^^^^^      |^^^^^^^^^^^^
-  // \_art.  |               |              |
+  let term-label = if wants_reference {
+      __term_label(key)
+    } else {
+      []
+    }
+    [#article#show-term(linked-term)#metadata(term)#term-label]
+  // |^^^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^^^
+  // \_art.  |                      |              |
   //         \_ apply user formatting function to the term
-  //                         |              |
-  //                         \_ metadata lets us label (ie it's "labelable")
-  //                                        |
-  //                                        \_ i.e. <__gloss:key>, etc.
-  //                                           for backlink from glossary
+  //                                |              |
+  //                                \_ metadata lets us label (ie makes it "labelable")
+  //                                               |
+  //                                               \_ i.e. <__gloss:key>, etc.
+  //                                                  for backlink from glossary
   }
 }
 
@@ -554,7 +584,7 @@
   // Collect and organize entries by group
   let output = (:)
   let all_entries = __gloss_entries.final()
-  let all_used = all_entries.keys().filter(key => __is_term_used(key))
+  let all_used = all_entries.keys().filter(key => __is_term_ever_used(key))
 
   // Determine which groups to process
   let all_groups = all_entries

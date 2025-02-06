@@ -41,7 +41,7 @@ different goals:
 ### Import the package
 
 ```typst
-#import "@preview/glossy:0.5.2": *
+#import "@preview/glossy:0.6.0": *
 ```
 
 ### Defining Glossary Terms
@@ -143,6 +143,7 @@ Available modifiers:
 - **short**: Shows only short form
 - **long**: Shows only long form
 - **def** or **desc**: Shows the description
+- **noref** or **noindex**: Don't show the term in the glossary.
 - **a** or **an**: Include the article (`an` is just an alias of `a`, they're
   equivalent)
 
@@ -160,6 +161,9 @@ Modifiers can be combined with colons:
 | `@tps:short:pl`     | "TPSes"                                                        |
 | `@tps:both:pl:cap`  | "Technical procedure specifications (TPSes)"                   |
 | `@tps:def`          | "A formal document describing test steps and expected results" |
+| `@tps:desc`         | _same as above, `desc` is an alias for `def`_                  |
+| `@tps:noref`        | _works as normal, just won't show up in glossary_              |
+| `@tps:noindex`      | _same as above, `noindex` is an alias for `noref`_             |
 
 The `a`/`an` modifier is special because it can either precede or follow the
 term's key.
@@ -179,6 +183,18 @@ For example:
 
 Note that the `a`/`an` (article) modifier cannot be combined with the `pl`
 (plural) modifier.
+
+### First use logic
+
+Any use of the `short`, `long`, or `both` modifier will not count against the
+term's first use.
+
+This is useful, for example, when you want to use a term in a heading or a
+caption. In that case, your term might end up in an `outline()` at the top of
+your document. Normally you don't want that to count as a term's first real use.
+Normally you want that to happen in the body of your document. So, by using
+these modifiers in such situations, you can not only specify exactly how you
+want your term to appear, but also control whether it counts as a "first use".
 
 ### Generating the Glossary
 

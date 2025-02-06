@@ -1,7 +1,6 @@
 // Inspired by academic textbook glossaries
 #let theme-academic = (
   section: (title, body) => {
-    set text(font: "New Computer Modern")
     heading(level: 1, title)
     v(1em)
     body
