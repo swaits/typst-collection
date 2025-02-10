@@ -30,7 +30,7 @@ Some languages are still missing. All contributions welcome.
 
 | **Icon**          | **Source**                                    | **License**                      |
 | ----------------- | --------------------------------------------- | -------------------------------- |
-| `agda.svg`        | [Agda][agda-source]                           | Unlicensed                       |
+| `agda.svg`        | [Agda][agda-source]                           | [BSD][agda-license]              |
 | `css3.svg`        | [CSS-Next/logo.css][css3-source]              | [CC0][css3-license]              |
 | `cuda.svg`        | [vscode-icons/vscode-icons][cuda-source]      | [MIT][cuda-license]              |
 | `lisp.svg`        | [Wikipedia (User:Jooja)][lisp-source]         | [CC BY-SA 4.0][lisp-license]     |
@@ -39,6 +39,7 @@ Some languages are still missing. All contributions welcome.
 | `typst-small.png` | [Dherse/codly][typst-source]                  | [MIT][typst-license]             |
 
 [agda-source]: https://github.com/agda/agda/blob/master/doc/user-manual/agda.svg
+[agda-license]: https://github.com/agda/agda/blob/master/LICENSE
 [css3-source]: https://github.com/CSS-Next/logo.css/blob/main/css.svg?short_path=c59d4da
 [css3-license]: https://github.com/CSS-Next/logo.css/blob/main/LICENSE
 [cuda-source]: https://github.com/vscode-icons/vscode-icons/tree/master
