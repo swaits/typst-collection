@@ -7,7 +7,7 @@
 // #import "@preview/codly:1.2.0": *
 // #show: codly-init
 //
-// #import "codly-languages.typ": *
+// #import "codly-languages.typ:0.1.7": *
 // #codly(languages: codly-languages)
 // ```
 #let codly-languages = {

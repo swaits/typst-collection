@@ -13,7 +13,7 @@ Configure `codly` with the languages. Like this:
 #import "@preview/codly:1.2.0": *
 #show: codly-init
 
-#import "@preview/codly-languages:0.1.6": *
+#import "@preview/codly-languages:0.1.7": *
 #codly(languages: codly-languages)
 ```
 
