@@ -1,6 +1,6 @@
 [package]
 name = "glossy"
-version = "0.6.0"
+version = "0.7.0"
 entrypoint = "lib.typ"
 authors = ["Stephen Waits <steve@waits.net>"]
 license = "MIT"

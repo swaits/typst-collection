@@ -1,5 +1,5 @@
 #import "/lib.typ": *
-#import "@preview/glossarium:0.5.1": *
+#import "@preview/glossarium:0.5.3": *
 
 #set page(height: auto, width: 4.5in)
 #show link: set text(fill: red)

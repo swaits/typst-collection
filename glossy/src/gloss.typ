@@ -1,4 +1,4 @@
-#import "@preview/valkyrie:0.2.1" as z
+#import "@preview/valkyrie:0.2.2" as z
 
 #import "./schemas.typ": *
 #import "./themes.typ": *
@@ -39,7 +39,7 @@
   if not "short" in entry {
     panic("Entry must contain a 'short' key")
   }
-  if type(entry.short) != "string" {
+  if type(entry.short) != str {
     panic("Entry 'short' must be a string")
   }
   if entry.short.trim() == "" {
@@ -347,7 +347,7 @@
 
   // Apply format-term() to get the term
   let formatted-term = format-term(mode, short-form, long-form)
-  if type(formatted-term) != "string" {
+  if type(formatted-term) != str {
     // This is because we still need to capitalize the term, and we cannot do
     // that with content, thus requiring a string here.
     // TODO: consider if we want to capitalize *before* this. First intuition is
