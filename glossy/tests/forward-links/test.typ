@@ -12,7 +12,7 @@
   stroke: 1pt,
   inset: 1em,
   [
-    #show: init-glossary.with((WWW: "World Wide Web"))
+    #show: init-glossary.with((WWW: "World Wide Web"), term-links: true)
 
     This should be a link: @WWW
 
