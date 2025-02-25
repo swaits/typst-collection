@@ -210,7 +210,7 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true) = {
+#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
   // ---------------------------------------------------------------------------
   // Check for illegal modifier combinations
   // ---------------------------------------------------------------------------
@@ -355,8 +355,14 @@
   let long-form = pluralize_term(entry.long, entry.longplural) // `none` safe here
 
   // Apply format-term() to get the term
-  let formatted-term = format-term(mode, short-form, long-form)
-  if type(formatted-term) != str {
+  let formatted-term = if display-text != none and display-text != auto {
+    // Display text was overriden by user, just accept it (string or content)
+    display-text
+  } else {
+    // Normal display (ie no override from user)
+    format-term(mode, short-form, long-form)
+  }
+  if "cap" in modifiers and type(formatted-term) != str {
     // This is because we still need to capitalize the term, and we cannot do
     // that with content, thus requiring a string here.
     // TODO: consider if we want to capitalize *before* this. First intuition is
@@ -526,6 +532,7 @@
   // Set up reference handling for glossary terms
   show ref: r => {
     let (raw_key, ..raw_modifiers) = str(r.target).split(":")
+    let supplement = r.supplement // used for term display overrides
 
     // Determine if we need to swap the key and first modifier.
     // Conditions for swapping:
@@ -545,7 +552,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links)
+      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, display-text: supplement)
     } else {
       // Not one of ours, so just pass it through
       r
