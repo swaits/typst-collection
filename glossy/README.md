@@ -203,7 +203,7 @@ Display the glossary using the `glossary()` function:
 ```typst
 #glossary(
   title: "Web Development Glossary", // Optional: defaults to Glossary theme:
-  my-theme, // Optional: defaults to theme-academic
+  theme: my-theme, // Optional: defaults to theme-academic
   sort: true, // Optional: whether or not to sort the glossary
   ignore-case: false, // Optional: ignore case when sorting terms
   groups: ("Web")  // Optional: Filter to specific groups
