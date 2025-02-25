@@ -478,7 +478,7 @@
   entries,
   format-term: __default-format-term,
   show-term: __default-show-term,
-  term-links: true,
+  term-links: false,
   body
 ) = context {
   // Type checking
