@@ -13,7 +13,7 @@ Configure `codly` with the languages. Like this:
 #import "@preview/codly:1.2.0": *
 #show: codly-init
 
-#import "@preview/codly-languages:0.1.7": *
+#import "@preview/codly-languages:0.1.8": *
 #codly(languages: codly-languages)
 ```
 
@@ -28,36 +28,45 @@ Some languages are still missing. All contributions welcome.
 
 ## Icon Attribution
 
-| **Icon**          | **Source**                                    | **License**                      |
-| ----------------- | --------------------------------------------- | -------------------------------- |
-| `agda.svg`        | [Agda][agda-source]                           | [BSD][agda-license]              |
-| `css3.svg`        | [CSS-Next/logo.css][css3-source]              | [CC0][css3-license]              |
-| `cuda.svg`        | [vscode-icons/vscode-icons][cuda-source]      | [MIT][cuda-license]              |
-| `lisp.svg`        | [Wikipedia (User:Jooja)][lisp-source]         | [CC BY-SA 4.0][lisp-license]     |
-| `nextflow.svg`    | [nextflow-io/trademark][nextflow-source]      | [Limited Use][nextflow-license]  |
-| `splunk.svg`      | [denali-design/denali-icons][splunk-source]   | [MIT][splunk-license]            |
-| `typst-small.png` | [Dherse/codly][typst-source]                  | [MIT][typst-license]             |
+| **Icon** | **Source**                    | **License**                  |
+|----------|-------------------------------|------------------------------|
+| BibTeX   | [Wikimedia][bibtex-source]    | Public Use                   |
+| JQ       | [Wikimedia][jq-source]        | [CC 3.0][jq-license]         |
+| Lean     | [WIkimedia][lean-source]      | [Apache 2.0][lean-license]   |
+| Strace   | [Wikimedia][strace-source]    | CC 4.0                       |
+| Typst    | [Typst Website][typst-source] | [Free to use][typst-license] |
 
-[agda-source]: https://github.com/agda/agda/blob/master/doc/user-manual/agda.svg
-[agda-license]: https://github.com/agda/agda/blob/master/LICENSE
-[css3-source]: https://github.com/CSS-Next/logo.css/blob/main/css.svg?short_path=c59d4da
-[css3-license]: https://github.com/CSS-Next/logo.css/blob/main/LICENSE
-[cuda-source]: https://github.com/vscode-icons/vscode-icons/tree/master
-[cuda-license]: https://github.com/vscode-icons/vscode-icons/blob/master/LICENSE
-[lisp-source]: https://commons.wikimedia.org/wiki/File:Lisp_logo.svg
-[lisp-license]: https://commons.wikimedia.org/wiki/File:Lisp_logo.svg#Licensing
-[nextflow-source]: https://github.com/nextflow-io/trademark
-[nextflow-license]: https://github.com/nextflow-io/trademark/blob/master/README.md
-[splunk-source]: https://github.com/denali-design/denali-icons/blob/master/svg/splunk.svg
-[splunk-license]: https://github.com/denali-design/denali-icons/blob/master/LICENSE.md
-[typst-source]: https://github.com/Dherse/codly
-[typst-license]: https://github.com/Dherse/codly/blob/main/LICENSE
+[bibtex-source]: https://commons.wikimedia.org/wiki/Category:BibTeX#/media/File:BibTeX_logo.svg
 
-All icons not listed in this table come from the
-[devicons/devicon][default-source] project, [MIT licensed][default-license].
+[jq-source]: https://commons.wikimedia.org/wiki/File:Jq_logo.svg
 
-[default-source]: https://github.com/devicons/devicon/
-[default-license]: https://github.com/devicons/devicon/blob/master/LICENSE
+[jq-license]: https://github.com/itchyny/jq/blob/master/COPYING
+
+[lean-source]: https://commons.wikimedia.org/wiki/File:Lean_logo2.svg
+
+[lean-license]: https://github.com/leanprover/lean4/blob/master/LICENSE
+
+[strace-source]: https://commons.wikimedia.org/wiki/File:Strace_logo.svg
+
+[typst-source]: https://typst.app/
+
+[typst-license]: https://typst.app/legal/brand/
+
+All icons that are not listed in the table come from one of the following icon sets.
+Which one can be taken from [`lib.typ`](./lib.typ).
+
+| **Iconset**  | **Source**                   | **License**                |
+|--------------|------------------------------|----------------------------|
+| Devicon      | [Github][devicon-source]     | [MIT][devicon-license]     |
+| VSCode Icons | [Github][vscodeicons-source] | [MIT][vscodeicons-license] |
+
+[devicon-source]: https://github.com/devicons/devicon/
+
+[devicon-license]: https://github.com/devicons/devicon/blob/master/LICENSE
+
+[vscodeicons-source]: https://github.com/vscode-icons/vscode-icons
+
+[vscodeicons-license]: https://github.com/vscode-icons/vscode-icons/blob/master/LICENSE
 
 ## License
 
