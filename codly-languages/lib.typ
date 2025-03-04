@@ -100,6 +100,7 @@
     h:                    (name: "C Header",          color: rgb("#005f91"), icon: __icon("cheader.svg")), //VSCode Icons
     //C#
     cs:                   (name: "C#",                color: rgb("#68217a"), icon: __icon("csharp.svg")), //Devicons
+    csharp:               (name: "C#",                color: rgb("#68217a"), icon: __icon("csharp.svg")), //Devicons
     csx:                  (name: "C#",                color: rgb("#68217a"), icon: __icon("csharp.svg")), //Devicons
     //C++
     C:                    (name: "C++",               color: rgb("#004482"), icon: __icon("cplusplus.svg")), //Devicons
@@ -130,14 +131,14 @@
     //CoffeeScript
     Cakefile:             (name: "CoffeeScript",      color: rgb("#28334c"), icon: __icon("coffeescript.svg")), //Devicons
     cson:                 (name: "CoffeeScript",      color: rgb("#28334c"), icon: __icon("coffeescript.svg")), //Devicons
-    coffeescript:         (name: "CoffeeScript",      color: rgb("#244776"), icon: __icon("coffeescript.svg")), //Devicons 
+    coffeescript:         (name: "CoffeeScript",      color: rgb("#244776"), icon: __icon("coffeescript.svg")), //Devicons
     coffee:               (name: "CoffeeScript",      color: rgb("#28334c"), icon: __icon("coffeescript.svg")), //Devicons
     //CSV
     csv:                  (name: "CSV",               color: rgb("#829ec2"), icon: __icon("text.svg")), //VSCode Icons
     tsv:                  (name: "TSV",               color: rgb("#829ec2"), icon: __icon("text.svg")), //VSCode Icons
     //CpuInfo
     cpuinfo:              (name: "CpuInfo",           color: rgb("#3c70cc"), icon: __emoji(emoji.info)),
-    //Crontab    
+    //Crontab
     crontab:              (name: "Crontab",           color: rgb("#e84f69"), icon: __emoji(emoji.clock.alarm)),
     tab:                  (name: "Crontab",           color: rgb("#e84f69"), icon: __emoji(emoji.clock.alarm)),
     //Crystal
@@ -268,7 +269,7 @@
     haskell:              (name: "Haskell",           color: rgb("#5e5187"), icon: __icon("haskell.svg")), //Devicons
     hs:                   (name: "Haskell",           color: rgb("#5e5187"), icon: __icon("haskell.svg")), //Devicons
     lhs:                  (name: "Haskell",           color: rgb("#5e5187"), icon: __icon("haskell.svg")), //Devicons
-    //Haxe    
+    //Haxe
     haxe:                 (name: "Haxe",              color: rgb("#ea8220"), icon: __icon("haxe.svg")), //Devicons
     //Highlight non-printables
     show_nonprintable:    (name: "Non Printables",    color: rgb("#829ec2"), icon: __icon("text.svg")), //VSCode Icons
@@ -350,7 +351,7 @@
     llvm:                 (name: "LLVM",              color: rgb("#09637d"), icon: __icon("llvm.svg")), //Devicons
     //log
     log:                  (name: "log",               color: rgb("#00bd02"), icon: __icon("log.svg")), //VSCode Icons
-    //Lua   
+    //Lua
     lua:                  (name: "Lua",               color: rgb("#000080"), icon: __icon("lua.svg")), //Devicons
     //Makefile
     make:                 (name: "Makefile",          color: rgb("#030303"), icon: __icon("makefile.svg")), //VSCode Icons
@@ -361,10 +362,10 @@
     mak:                  (name: "Makefile",          color: rgb("#030303"), icon: __icon("makefile.svg")), //VSCode Icons
     mk:                   (name: "Makefile",          color: rgb("#030303"), icon: __icon("makefile.svg")), //VSCode Icons
     //Manpage
-    manpage:              (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)), 
-    man:                  (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)), 
-    groff:                (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)), 
-    troff:                (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)), 
+    manpage:              (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)),
+    man:                  (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)),
+    groff:                (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)),
+    troff:                (name: "Manpage",           color: rgb("#ef4469"), icon: __emoji(emoji.quest)),
     //Markdown
     md:                   (name: "Markdown",          color: rgb("#755838"), icon: __icon("markdown.svg")), //VSCode Icons
     mdown:                (name: "Markdown",          color: rgb("#755838"), icon: __icon("markdown.svg")), //VSCode Icons
@@ -584,8 +585,11 @@
     //SSH
     ssh:                  (name: "SSH",               color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
     ssh_config:           (name: "SSH Config",        color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
+    ssh-config:           (name: "SSH Config",        color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
     sshd_config:          (name: "SSHD Config",       color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
+    sshd-config:          (name: "SSHD Config",       color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
     known_hosts:          (name: "Known Hosts",       color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
+    known-hosts:          (name: "Known Hosts",       color: rgb("#231f20"), icon: __icon("ssh.svg")), //Devicons
     //Strace
     strace:               (name: "Strace",            color: rgb("#f59217"), icon: __icon("strace.svg")), //Wikimedia
     //Stylus
@@ -687,5 +691,5 @@
     yml:                  (name: "YAML",              color: rgb("#cb171e"), icon: __icon("yaml.svg")), //Devicons
     //Zig
     zig:                  (name: "Zig",               color: rgb("#f7a41d"), icon: __icon("zig.svg")), //Devicons
-  ) 
+  )
 }
