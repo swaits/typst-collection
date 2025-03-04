@@ -2,6 +2,7 @@
 
 #let base-languages = (
   "aarch64",
+  "agda",
   "angular",
   "ansible",
   "apache",

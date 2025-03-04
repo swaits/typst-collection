@@ -4,10 +4,10 @@
 // To use:
 //
 // ```typst
-// #import "@preview/codly:1.1.1": *
+// #import "@preview/codly:1.2.0": *
 // #show: codly-init
 //
-// #import "codly-languages.typ": *
+// #import "codly-languages.typ:0.1.7": *
 // #codly(languages: codly-languages)
 // ```
 #let codly-languages = {
@@ -25,6 +25,7 @@
   (
     aarch64:       (name: "Assembly (ARM)",   color: rgb("#1b3888"), icon: __icon("aarch64.svg")),
       arm:         (name: "Assembly (ARM)",   color: rgb("#1b3888"), icon: __icon("aarch64.svg")),
+    agda:          (name: "Agda",             color: rgb("#ffffff"), icon: __icon("agda.svg")),
     angular:       (name: "Angular",          color: rgb("#dd0031"), icon: __icon("angular.svg")),
     ansible:       (name: "Ansible",          color: rgb("#1a1918"), icon: __icon("ansible.svg")),
     apache:        (name: "Apache",           color: rgb("#b7342a"), icon: __icon("apache.svg")),
