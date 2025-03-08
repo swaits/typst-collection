@@ -603,6 +603,7 @@
   sort: true,
   ignore-case: false,
   groups: (),
+  show-all: false,
 ) = context {
   // Type checking
   let checked-title = z.parse(title, z.content(), scope: ("title",))
@@ -613,7 +614,11 @@
   // Collect and organize entries by group
   let output = (:)
   let all_entries = __gloss_entries.final()
-  let all_used = all_entries.keys().filter(key => __is_term_ever_used(key))
+  let all_used = if not show-all {
+    all_entries.keys().filter(key => __is_term_ever_used(key))
+  } else {
+    all_entries.keys()
+  }
 
   // Determine which groups to process
   let all_groups = all_entries
