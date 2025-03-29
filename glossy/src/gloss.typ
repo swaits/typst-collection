@@ -208,7 +208,7 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true) = {
+#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true, supplement: none) = {
   // ---------------------------------------------------------------------------
   // Check for illegal modifier combinations
   // ---------------------------------------------------------------------------
@@ -355,6 +355,9 @@
 
   // Get the article, then capitalize either the article or term (if requested)
   let (article, term) = capitalize_term(get_article(mode), formatted-term)
+  if type(supplement) == content {
+    term = supplement
+  }
 
   // ---------------------------------------------------------------------------
   // Construct and return the final output
@@ -521,7 +524,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links)
+      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, supplement: r.supplement)
     } else {
       // Not one of ours, so just pass it through
       r
