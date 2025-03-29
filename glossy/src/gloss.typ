@@ -238,11 +238,9 @@
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
-  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
+  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "nofirst" not in modifiers) or "first" in modifiers
   let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
-  if wants_reference {
-    __mark_term_used(key, count-as-first-use)
-  }
+  __mark_term_used(key, count-as-first-use)
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -352,7 +350,7 @@
     // that with content, thus requiring a string here.
     // TODO: consider if we want to capitalize *before* this. First intuition is
     // "no".
-    panic("Your cutsom format-term() function must return a string.")
+    panic("Your custom format-term() function must return a string.")
   }
 
   // Get the article, then capitalize either the article or term (if requested)
