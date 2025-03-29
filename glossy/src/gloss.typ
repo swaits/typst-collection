@@ -8,6 +8,7 @@
 
 #let __gloss_label_prefix = "__gloss:"
 #let __gloss_first_use_counter_postfix = ":first-use-count"
+#let __gloss_entry_postfix = ":entry"
 
 // Normalizes a dictionary entry by ensuring all required and optional keys exist
 // with appropriate default values.
@@ -122,6 +123,18 @@
   label(__gloss_label_prefix + key)
 }
 
+// Creates a label object for the entry in the glossary.
+//
+// Parameters:
+//   key (string): The glossary entry key
+//
+// Returns:
+//   label: A Typst label object for the term usage
+//
+#let __entry_label(key) = {
+  label(__gloss_label_prefix + key + __gloss_entry_postfix)
+}
+
 // Updates the term usage in the glossary state.
 //
 // Parameters:
@@ -179,7 +192,7 @@
 //   boolean: If the term is visible in the glossary (and the label is unique)
 //
 #let __has_glossary_entry(key) = {
-  query(<glossary>).len() > 0 and query(selector(label(key)).after(<glossary>)).len() == 1
+  query(__entry_label(key)).len() > 0
 }
 
 // Renders a glossary term with various formatting options.
@@ -362,8 +375,8 @@
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    let linked-term = if term-links and __has_glossary_entry(key) {
-      link(label(key), term)
+    let linked-term = if term-links and query(__entry_label(key)).len() > 0 {
+      link(__entry_label(key), term)
     } else {
       term
     }
@@ -495,10 +508,8 @@
   // Process and store each glossary entry
   for (key, entry) in entries {
     __add_entry(key, __normalize_entry(key, entry))
-    // Create placeholder labels for autocompletion (if not already present)
-    context if not __has_glossary_entry(key) [
-      #metadata(key)#label(key)
-    ]
+    // Create placeholder labels for autocompletion
+    [#metadata(key)#label(key)]
   }
 
   // Set up reference handling for glossary terms
@@ -621,7 +632,7 @@
           short: entry.at("short"),
           long: entry.at("long"),
           description: entry.at("description"),
-          label: [#metadata(key)#label(key)],
+          label: [#metadata(key)#__entry_label(key)],
           pages: __create_backlinks(key)
         ))
       }
