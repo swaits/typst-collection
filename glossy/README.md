@@ -126,6 +126,12 @@ And then loaded during initialization as follows:
 #show: init-glossary.with(yaml("glossary.yaml"))
 ```
 
+`init-glossary()` supports the following parameters:
+
+- `format-term` // TODO: document this
+- `show-term` // Function which can customize display of a term (see example below)
+- `link-terms: false` // True if you want terms to link to their glossary entry
+
 ### Using Glossary Terms
 
 Reference glossary terms using Typst's `@reference` syntax:
@@ -184,6 +190,18 @@ For example:
 Note that the `a`/`an` (article) modifier cannot be combined with the `pl`
 (plural) modifier.
 
+### Overriding Term Text
+
+There may be cases where you want to completely control what `glossy` displays
+when you reference a term. For example, imagine you want to reference `@tps`
+which would normally render as something like "test procedure specification."
+But for some reason you want it to actually say "an annoying report." You can do
+that like this:
+
+| **Input**                 | **Output**           |
+| ------------------------- | -------------------- |
+| `@tps[an annoying report` | "an annoying report" |
+
 ### First use logic
 
 Any use of the `short`, `long`, or `both` modifier will not count against the
@@ -206,7 +224,8 @@ Display the glossary using the `glossary()` function:
   theme: my-theme, // Optional: defaults to theme-academic
   sort: true, // Optional: whether or not to sort the glossary
   ignore-case: false, // Optional: ignore case when sorting terms
-  groups: ("Web")  // Optional: Filter to specific groups
+  groups: ("Web"),  // Optional: Filter to specific groups
+  show-all: false, // Optional; Show all terms even if unreferenced
 )
 ```
 
