@@ -58,7 +58,9 @@
     longplural: entry.at("longplural", default: __pluralize(long)),
     longarticle: entry.at("longarticle", default: __determine_article(long)),
     description: entry.at("description", default: none),
-    group: entry.at("group", default: "")
+    group: entry.at("group", default: ""),
+    firstuse: entry.at("firstuse", default: "both"),
+    lateruse: entry.at("lateruse", default: "short"),
   )
 }
 
@@ -208,7 +210,7 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true) = {
+#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true, supplement: none) = {
   // ---------------------------------------------------------------------------
   // Check for illegal modifier combinations
   // ---------------------------------------------------------------------------
@@ -238,11 +240,9 @@
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
-  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
+  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "nofirst" not in modifiers) or "first" in modifiers
   let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
-  if wants_reference {
-    __mark_term_used(key, count-as-first-use)
-  }
+  __mark_term_used(key, count-as-first-use)
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -290,56 +290,33 @@
     }
   }
 
-  // determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available):
-  // Decides which mode ("short", "long", or "both") to use.
-  // Preference is given to explicit modifiers. If the requested mode can't be fulfilled due to no long form,
-  // fall back to "short".
-  // If no explicit mode is given, the default behavior is:
-  //   - On first use and if a long form exists, "both".
-  //   - Otherwise, "short".
-  let determine_mode = (wants_both, wants_long, wants_short, is_first_use, long_available) => {
-    if wants_both {
-      // Explicit request for "both":
-      // If a long form exists, use "both", otherwise fall back to "short".
-      if long_available {
-        "both"
-      } else {
-        "short"
-      }
-    } else if wants_long {
-      // Explicit request for "long":
-      // If a long form exists, use "long", otherwise fall back to "short".
-      if long_available {
-        "long"
-      } else {
-        "short"
-      }
-    } else if wants_short {
-      // Explicit request for "short":
-      // Always "short" regardless of availability.
-      "short"
-    } else {
-      // No explicit mode given:
-      // On first use with a long form available, default to "both".
-      // Otherwise, use "short".
-      if is_first_use and long_available {
-        "both"
-      } else {
-        "short"
-      }
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // Determine desired options based on modifiers and entry.long availability
   // ---------------------------------------------------------------------------
-  let wants_both = "both" in modifiers
-  let wants_long = "long" in modifiers
-  let wants_short = "short" in modifiers
-  let long_available = entry.long != none
 
-  // Determine mode using the helper function
-  let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available)
+  // Decide which mode ("short", "long", or "both") to use.
+  // Preference is given to explicit modifiers. If the requested mode can't be fulfilled due to no long form,
+  // fall back to "short".
+  // If no explicit mode is given, use entry.firstuse and entry.lateruse, which default to
+  //   - On first use and if a long form exists, "both".
+  //   - Otherwise, "short".
+  if "both" not in modifiers and "long" not in modifiers and "short" not in modifiers {
+    if is_first_use {
+      modifiers.push(entry.firstuse)
+    } else {
+      modifiers.push(entry.lateruse)
+    }
+  }
+
+  let long_available = entry.long != none
+  let mode = if "both" in modifiers and long_available {
+    "both"
+  } else if "long" in modifiers and long_available {
+    "long"
+  } else {
+    "short"
+  }
 
   // Pluralize (if requested)
   let short-form = pluralize_term(entry.short, entry.plural)
@@ -352,11 +329,14 @@
     // that with content, thus requiring a string here.
     // TODO: consider if we want to capitalize *before* this. First intuition is
     // "no".
-    panic("Your cutsom format-term() function must return a string.")
+    panic("Your custom format-term() function must return a string.")
   }
 
   // Get the article, then capitalize either the article or term (if requested)
   let (article, term) = capitalize_term(get_article(mode), formatted-term)
+  if type(supplement) == content {
+    term = supplement
+  }
 
   // ---------------------------------------------------------------------------
   // Construct and return the final output
@@ -523,7 +503,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links)
+      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, supplement: r.supplement)
     } else {
       // Not one of ours, so just pass it through
       r
