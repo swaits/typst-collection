@@ -408,15 +408,6 @@
       [#metadata("hidden term")#term-label]
     } else {
       // normal term display (ie not hidden)
-
-      // create the forward link, if watned
-      let linked-term = if term-links and __has_glossary_entry(key) {
-        link(label(key), term)
-      } else {
-        term
-      }
-
-      // and the final content
       [#article#show-term(linked-term)#metadata(term)#term-label]
       // |^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^^^
       // \_art.|                      |              |
