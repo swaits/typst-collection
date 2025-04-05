@@ -130,7 +130,7 @@ And then loaded during initialization as follows:
 
 - `format-term` // TODO: document this
 - `show-term` // Function which can customize display of a term (see example below)
-- `link-terms: false` // True if you want terms to link to their glossary entry
+- `term-links: false` // True if you want terms to link to their glossary entry
 
 ### Using Glossary Terms
 
