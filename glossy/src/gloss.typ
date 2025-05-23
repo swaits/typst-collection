@@ -380,7 +380,7 @@
     // that with content, thus requiring a string here.
     // TODO: consider if we want to capitalize *before* this. First intuition is
     // "no".
-    panic("Your cutsom format-term() function must return a string.")
+    panic("Your custom format-term() function must return a string.")
   }
 
   // Get the article, then capitalize either the article or term (if requested)
@@ -390,7 +390,7 @@
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    let linked-term = if term-links and query(__entry_label(key)).len() > 0 {
+    let linked-term = if term-links and __has_glossary_entry(key) {
       link(__entry_label(key), term)
     } else {
       term
