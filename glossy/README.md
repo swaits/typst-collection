@@ -198,9 +198,13 @@ which would normally render as something like "test procedure specification."
 But for some reason you want it to actually say "an annoying report." You can do
 that like this:
 
-| **Input**                 | **Output**           |
-| ------------------------- | -------------------- |
-| `@tps[an annoying report` | "an annoying report" |
+| **Input**                  | **Output**           |
+| -------------------------- | -------------------- |
+| `@tps[an annoying report]` | "an annoying report" |
+| `@tps[]`                   | #none                |
+
+In case you want to reference a term from the Glossary/Index, but don't
+want to display it for whatever reason, the second form can be used.
 
 ### First use logic
 
