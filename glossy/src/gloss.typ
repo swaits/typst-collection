@@ -207,8 +207,6 @@
 //     - "long": Show only the long form.
 //     - "def" or "desc": Show the term's description instead of its name.
 //     - "a" or "an": Prepend an article, chosen from the entry (short or long form).
-//     - "hide" or "hidden": Use term (for the sake of the glossary/index),
-//     but don't display it.
 //   show-term (function): A function that renders the chosen term.
 //   term-links (boolean): If terms should be clickable links leading to glossary
 //
@@ -232,9 +230,6 @@
   }
   if ("a" in modifiers or "an" in modifiers) and ("pl" in modifiers) {
     panic("Cannot use 'a'/'an' and 'pl' together.")
-  }
-  if ("hidden" in modifiers or "hide" in modifiers) and modifiers.len() > 1{
-    panic("Cannot use 'hide'/'hidden' with other modifiers.")
   }
 
   // ---------------------------------------------------------------------------
@@ -315,11 +310,8 @@
   // If no explicit mode is given, the default behavior is:
   //   - On first use and if a long form exists, "both".
   //   - Otherwise, "short".
-  let determine_mode = (wants_both, wants_long, wants_short, is_first_use, long_available, wants_hidden) => {
-    if wants_hidden {
-      // If it's hidden, nothing else matters
-      "hidden"
-    } else if wants_both {
+  let determine_mode = (wants_both, wants_long, wants_short, is_first_use, long_available) => {
+    if wants_both {
       // Explicit request for "both":
       // If a long form exists, use "both", otherwise fall back to "short".
       if long_available {
@@ -357,11 +349,10 @@
   let wants_both = "both" in modifiers
   let wants_long = "long" in modifiers
   let wants_short = "short" in modifiers
-  let wants_hidden = ("hidden" in modifiers or "hide" in modifiers)
   let long_available = entry.long != none
 
   // Determine mode using the helper function
-  let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available, wants_hidden)
+  let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available)
 
   // Pluralize (if requested)
   let short-form = pluralize_term(entry.short, entry.plural)
@@ -403,21 +394,13 @@
     }
 
     // Create the output content
-    if mode == "hidden" {
-      // just put the metadata+label out there
-      [#metadata("hidden term")#term-label]
-    } else {
-      // normal term display (ie not hidden)
-      [#article#show-term(linked-term)#metadata(term)#term-label]
-      // |^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^^^
-      // \_art.|                      |              |
-      //       \_ apply user formatting function to the term
-      //                              |              |
-      //                              \_ metadata lets us label (ie makes it "labelable")
-      //                                             |
-      //                                             \_ i.e. <__gloss:key>, etc.
-      //                                                for backlink from glossary
-    }
+    [#article#show-term(linked-term)#metadata(term)#term-label]
+    // |^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^
+    // |     |                      |              \_ the label for backlink from
+    // |     |                      |                 glossary i.e. <__gloss:key>, etc.
+    // |     |                      \_ metadata lets us label (ie makes it "labelable")
+    // |     \_ apply user formatting function to the term
+    // \_art.
   }
 }
 

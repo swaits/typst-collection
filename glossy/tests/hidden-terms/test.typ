@@ -24,9 +24,9 @@
 
 = Hiding terms
 
-Here's a hidden term: @html:hide
+Here's a hidden term: @html[]
 
-Here's another hidden term: @css:hidden
+Here's another hidden term: @css[]
 
 And here's a shown term: @tps
 
