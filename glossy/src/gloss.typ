@@ -282,7 +282,7 @@
   let capitalize_term = (article, term) => {
     if "cap" not in modifiers {
       (article, term)
-    } else if article == "" {
+    } else if article == none {
       // No article present, so capitalize the term's first letter.
       (article, upper(term.first()) + term.slice(1))
     } else {
@@ -292,14 +292,14 @@
   }
 
   // get_article(mode): Returns the appropriate article string based on the mode.
-  //   - If wants_article is false, returns an empty string.
+  //   - If wants_article is false, returns none
   //   - If mode is "short", return the short article.
   //   - If mode is "long" or "both", return the long article.
   // The calling logic ensures that when mode = "long" or "both", a long form exists.
   let get_article = (mode) => {
     let wants_article = "a" in modifiers or "an" in modifiers
     if not wants_article {
-      ""
+      none
     } else if mode == "short" {
       entry.article + " "
     } else {
