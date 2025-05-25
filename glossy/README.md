@@ -325,3 +325,10 @@ glossary entry will not work.
 ## License
 
 This project is licensed under the MIT License.
+
+## Changelog
+
+### v0.9.0
+- **Breaking**: In themes, entry.pages now returns an array of linked
+  page numbers, instead of opaque content. Use `#entry.pages.join(", ")`
+  in your custom theme to keep the previous behaviour.
