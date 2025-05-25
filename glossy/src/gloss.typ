@@ -406,20 +406,21 @@
 
 // Creates page number links back to each usage of a glossary term.
 //
-// This function generates a comma-separated list of page numbers, where each
-// number links back to a usage of the term in the document. Duplicate page
-// numbers are removed to avoid redundancy.
+// This function generates an array of page numbers, where each number links
+// back to a usage of the term in the document. Duplicate page numers are
+// removed to avoid redundancy.
 //
 // Parameters:
 //   key (string): The glossary entry key
 //
 // Returns:
-//   content: Comma-separated list of linked page numbers
+//   array: Linked page numbers
 //
-// Example output: "1, 3, 5" where each number links to the term usage on that page
+// Example output after a typical .join(", "):
+// "1, 3, 5" where each number links to the term usage on that page
 //
 #let __create_backlinks(key) = {
-  return context query(__term_label(key)) // find all reference
+  return query(__term_label(key)) // find all reference
     .map(meta => { // extract location and page number (or symbol)
       let loc = meta.location()
       let page = numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
@@ -427,7 +428,6 @@
     })
     .dedup(key: ((loc, page)) => page) // deduplicate by page
     .map(((loc, page)) => link(loc, page)) // create links
-    .join(", ")
 }
 
 // Formats a term string based on the specified mode.
@@ -575,7 +575,7 @@
 //         - long: Long form of term (optional)
 //         - description: Term description (optional)
 //         - label: Term's dictionary label
-//         - pages: Linked page numbers where term appears
+//         - pages: Array of linked page numbers where term appears
 //       - index: Zero-based entry index within group
 //       - total: Total entries in group
 //   groups (array): Optional list of groups to include

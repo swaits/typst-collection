@@ -304,7 +304,7 @@ Customize glossary appearance by defining a theme with three functions:
         columns: (auto, 1fr, auto),
         output,
         repeat([#h(0.25em) . #h(0.25em)]),
-        entry.pages,
+        entry.pages.join(", "),
       )
     )
   }
@@ -317,7 +317,7 @@ Entry fields available to themes:
 - `long`: Long form (can be `none`)
 - `description`: Term description (can be `none`)
 - `label`: Term's dictionary label
-- `pages`: Linked page numbers where term appears
+- `pages`: Array of linked page numbers where term appears
 
 **NOTE:** If the theme does not emit `entry.label`, linking form terms to their
 glossary entry will not work.

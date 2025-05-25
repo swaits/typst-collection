@@ -44,7 +44,7 @@
   //     - long: Long form of term (optional)
   //     - description: Term description (optional)
   //     - label: Term's dictionary label
-  //     - pages: Linked page numbers where term appears
+  //     - pages: Array of linked page numbers where term appears
   //   index: Zero-based entry index within group
   //   total: Total entries in group
   entry: (entry, index, total) => {
@@ -83,7 +83,7 @@
         text(
           size: 0.6em,
           fill: gray.darken(20%),
-          entry.pages
+          entry.pages.join(", ")
         )
       )
     )

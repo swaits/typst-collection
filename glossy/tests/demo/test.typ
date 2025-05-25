@@ -117,7 +117,7 @@ which one to display.
         columns: (auto, 1fr, auto),
         output,
         repeat([#h(0.25em) . #h(0.25em)]),
-        entry.pages,
+        entry.pages.join(", "),
       )
     )
   }
