@@ -128,7 +128,8 @@ And then loaded during initialization as follows:
 
 `init-glossary()` supports the following parameters:
 
-- `format-term` // TODO: document this
+- `format-term` // Function deciding how to format a term, depending on
+  the 'mode' (short, long, both). See example below.
 - `show-term` // Function which can customize display of a term (see example below)
 - `link-terms: false` // True if you want terms to link to their glossary entry
 
@@ -248,7 +249,7 @@ Or to just show the empty group (i.e. terms without a group):
 
 ### Customizing Term Display
 
-Control how terms appear in the document by providing a custom `show-term` function:
+Control how terms are styled in the document by providing a custom `show-term` function:
 
 ```typst
 #let emph-term(term-body) = { emph(term-body) }
@@ -256,6 +257,26 @@ Control how terms appear in the document by providing a custom `show-term` funct
 #show: init-glossary.with(
   myGlossary,
   show-term: emph-term
+)
+```
+
+Terms can be formatted depending on the 'mode' by providing a custom
+`format-term` function. The mode is one of ("short", "long", "both").
+
+```typst
+// When displaying both, reverse the display order by showing
+// "short (long)" instead of the normal "long (short)"
+#let short-long-term(mode, short-form, long-form) = {
+    if mode == "short" { short-form }
+    else if mode == "long" { long-form }
+    else { // mode assumed to be "both"
+      short-form + " (" + long-form + ")"
+    }
+}
+
+#show: init-glossary.with(
+  myGlossary,
+  format-term: short-long-term
 )
 ```
 
