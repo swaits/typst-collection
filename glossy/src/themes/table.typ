@@ -27,6 +27,6 @@
   },
 
   entry: (entry, index, total) => {
-    (entry.short + entry.label, entry.long, entry.description, entry.pages)
+    (entry.short + entry.label, entry.long, entry.description, entry.pages.join(", "))
   }
 )
