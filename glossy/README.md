@@ -250,9 +250,9 @@ by the 'mode' in which it is printed. These modes are all mutually exclusive.
 | Mode          | Utilization         | Default first use behaviour | Description |
 | ------------- | ------------------- | --------------------------- | ----------- |
 | `auto`        | `@term`             | use       | The default mode when no 'mode' modifier or supplement is specified. The form depends on the first use counter. |
-| `both`        | `:both`             | use       | Shows both forms of the term, by default ([see `format-term`](#customizing-term-display)) like "Long Form (Short Form)". |
+| `both`        | `:both`             | use       | Shows both forms of the term, by default ([see `format-term`](#customizing-term-display)) like "Long Form (Short Form)". Falls back to short when long form not available. |
 | `short`       | `:short`            | no-use    | Shows only short form.        |
-| `long`        | `:long`             | no-use    | Shows only long form.         |
+| `long`        | `:long`             | no-use    | Shows only long form. Falls back to short when long form not available. |
 | `description` | `:def` <br> `:desc` | no-use    | Shows the description (None of the modifiers apply here & no link is created towards the glossary). |
 | `supplement`  | `[content]`         | no-use    | Shows the content given by [the supplement](#overriding-term-text). |
 | `reset`       | `:reset`            | reset usage counter to 0 | Don't output any content & don't link to the glossary. Typical usage would be after an abstract or even before the start of each chapter, maybe in an injected rule. (This could be made a modifier like `:use` or `:nouse`, but would mostly be utilized as `@term:reset:noindex[]` anyways, thus this is a mode. Write `@term@term:reset` to utilize it as a modifier.) |
