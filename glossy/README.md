@@ -224,15 +224,15 @@ first use (`usage counter == 0`), 'both' forms are printed. On subsequent usage
 (`usage counter > 0`) the 'short' form is printed.
 
 Not all occurrences of a term are counted towards its usage, this depends on
-the mode of the term.
-They are documented in the [reference tables](#reference-for-using-glossary-terms).
+the mode of the term. Furthermore, this can be manually controlled by modifiers.
+Both are documented in the [reference tables](#reference-for-using-glossary-terms).
 
 This control over the usage counter is practical, for example, when you want to
 use a term in a heading or a caption.
 In that case, your term might end up in an `outline()` at the top of
 your document. Normally you don't want that to count as a term's first real use.
 Normally you want that to happen in the body of your document. So, by using
-the appropriate mode in such situations, you can not only specify
+the appropriate mode and modifiers in such situations, you can not only specify
 exactly how you want your term to appear, but also control whether it counts
 as a "first use".
 
@@ -241,6 +241,7 @@ as a "first use".
 A reference about
 - the different 'modes' and how they determine which information is printed about a term
 - the impact of modes on the [usage counter and ensuing first use behaviour](#first-use-logic)
+- how modifiers can change the behaviour with respect to the usage counter
 - how modifiers impact the presentation of the information printed
 
 A glossary term can display different types of information, which is determined
@@ -249,16 +250,17 @@ by the 'mode' in which it is printed. These modes are all mutually exclusive.
 | Mode          | Utilization         | Default first use behaviour | Description |
 | ------------- | ------------------- | --------------------------- | ----------- |
 | `auto`        | `@term`             | use       | The default mode when no 'mode' modifier or supplement is specified. The form depends on the first use counter. |
-| `both`        | `:both`             | no-use    | Shows both forms of the term, by default ([see `format-term`](#customizing-term-display)) like "Long Form (Short Form)". |
+| `both`        | `:both`             | use       | Shows both forms of the term, by default ([see `format-term`](#customizing-term-display)) like "Long Form (Short Form)". |
 | `short`       | `:short`            | no-use    | Shows only short form.        |
 | `long`        | `:long`             | no-use    | Shows only long form.         |
 | `description` | `:def` <br> `:desc` | no-use    | Shows the description (None of the modifiers apply here & no link is created towards the glossary). |
-| `supplement`  | `[content]`         | use       | Shows the content given by [the supplement](#overriding-term-text). |
+| `supplement`  | `[content]`         | no-use    | Shows the content given by [the supplement](#overriding-term-text). |
+| `reset`       | `:reset`            | reset usage counter to 0 | Don't output any content & don't link to the glossary. Typical usage would be after an abstract or even before the start of each chapter, maybe in an injected rule. (This could be made a modifier like `:use` or `:nouse`, but would mostly be utilized as `@term:reset:noindex[]` anyways, thus this is a mode. Write `@term@term:reset` to utilize it as a modifier.) |
 
-Minor modifications to how these different types of information are printed or
-linked, are controlled by the 'modifiers'.
-They do not influence the default first use behaviour of the mode (except `noindex`).
-Moreover, they neatly compose together
+Minor modifications to how these different types of information are printed,
+linked or counted towards the usage counter, are controlled by the 'modifiers'.
+They do not influence the default first use behaviour of the mode (unless
+explicitely created for this purpose). Moreover, they neatly compose together
 and with most modes (some exceptions exists, but will print a clear error -
 report a bug if not).
 
@@ -266,8 +268,10 @@ report a bug if not).
 | ------------------------------ | ---------------------------------------------------------------------- |
 | `:cap`                         | Capitalizes the term                                                   |
 | `:pl`                          | Uses the plural form                                                   |
-| `:noref` <br> `:noindex`       | Don't show the term in the glossary (i.e. no page will be linked - a link from the term towards the glossary is always provided.) AND don't count towards the usage counter. |
+| `:noref` <br> `:noindex`       | Don't show the term in the glossary (i.e. no page will be linked - a link from the term towards the glossary is always provided.). |
 | `:a`<br>`a:`<br>`:an`<br>`an:` | Include the article (`an` is just an alias of `a`, they're equivalent) |
+| `:use` <br> `:spend`           | After this occurrence, the term is 'used', i.e. the usage counter is increased by 1. Write `@term:use:noindex[]` to uniquely control the usage counter without output. |
+| `:nouse` <br> `:nospend`       | After this occurrence, the usage counter remains exactly as the same as before. As if the term is transparent with respect to the usage counter. |
 
 ### Generating the Glossary
 
