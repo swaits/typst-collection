@@ -407,3 +407,5 @@ This project is licensed under the MIT License.
 - **Breaking**: In themes, entry.pages now returns an array of linked
   page numbers, instead of opaque content. Use `#entry.pages.join(", ")`
   in your custom theme to keep the previous behaviour.
+- **Breaking**: The `both` mode (previously called modifier) by default
+  now counts towards the first use of a term.
