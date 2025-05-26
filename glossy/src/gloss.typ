@@ -234,6 +234,9 @@
   if ("a" in modifiers or "an" in modifiers) and ("pl" in modifiers) {
     panic("Cannot use 'a'/'an' and 'pl' together.")
   }
+  if ("use" in modifiers or "spend" in modifiers) and ("nouse" in modifiers or "nospend" in modifiers) {
+    panic("Cannot use 'use'/'spend' and 'nouse'/'nospend' together.")
+  }
 
   // ---------------------------------------------------------------------------
   // Retrieve the glossary entry and its label
@@ -258,8 +261,11 @@
                                 and "long" not in modifiers  // mode is not long
                                 and "both" not in modifiers  // mode is not both
                                 and (display-text == none or display-text == auto)) // mode is not supplement
+  let force-count-as-first-use = ("use" in modifiers or "spend" in modifiers)
+  let force-skip-as-first-use = ("nouse" in modifiers or "nospend" in modifiers)
   let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
-  __mark_term_used(key, wants_reference, default-count-as-first-use)
+  __mark_term_used(key, wants_reference, force-count-as-first-use
+                                         or (not force-skip-as-first-use and default-count-as-first-use))
 
   // ---------------------------------------------------------------------------
   // Helper Functions
