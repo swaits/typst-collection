@@ -135,7 +135,8 @@
   label(__gloss_label_prefix + key + __gloss_entry_postfix)
 }
 
-// Updates the term usage in the glossary state.
+// Updates the term usage (first use counter & wants to be referenced counter)
+// in the glossary state.
 //
 // Parameters:
 //   key (string): The glossary entry key
@@ -143,14 +144,16 @@
 // Returns:
 //   none: Updates state as a side effect
 //
-#let __mark_term_used(key, count-as-first-use) = {
-  counter(__gloss_label_prefix + key).step()
+#let __mark_term_used(key, count-as-referenced, count-as-first-use) = {
+  if count-as-referenced {
+    counter(__gloss_label_prefix + key).step()
+  }
   if count-as-first-use {
     counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).step()
   }
 }
 
-// Queries whether the term is used ANYWHERE
+// Queries whether the term wants to be referenced from ANYWHERE
 //
 // Parameters:
 //   key (string): The glossary entry key
@@ -159,7 +162,7 @@
 // Returns:
 //   boolean: If the entry is used above the location in the document
 //
-#let __is_term_ever_used(key, location: none) = {
+#let __is_term_ever_referenced(key, location: none) = {
   let c = counter(__gloss_label_prefix + key)
   c = if location == none {c.final()} else {c.at(location)}
   c.at(0) > 0
@@ -251,11 +254,12 @@
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
-  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
+  let default-count-as-first-use = ("short" not in modifiers // mode is not short
+                                and "long" not in modifiers  // mode is not long
+                                and "both" not in modifiers  // mode is not both
+                                and (display-text == none or display-text == auto)) // mode is not supplement
   let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
-  if wants_reference {
-    __mark_term_used(key, count-as-first-use)
-  }
+  __mark_term_used(key, wants_reference, default-count-as-first-use)
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -605,7 +609,7 @@
   let output = (:)
   let all_entries = __gloss_entries.final()
   let all_used = if not show-all {
-    all_entries.keys().filter(key => __is_term_ever_used(key))
+    all_entries.keys().filter(key => __is_term_ever_referenced(key))
   } else {
     all_entries.keys()
   }
