@@ -259,7 +259,6 @@
   let is_first_use = not __is_term_first_used(key, location: here())
   let default-count-as-first-use = ("short" not in modifiers // mode is not short
                                 and "long" not in modifiers  // mode is not long
-                                and "both" not in modifiers  // mode is not both
                                 and (display-text == none or display-text == auto)) // mode is not supplement
   let force-count-as-first-use = ("use" in modifiers or "spend" in modifiers)
   let force-skip-as-first-use = ("nouse" in modifiers or "nospend" in modifiers)
