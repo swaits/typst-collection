@@ -142,19 +142,27 @@ In modern web development, languages like @html and @css are essential.
 The @tps:pl need to be submitted by Friday.
 ```
 
-Available modifiers:
+Available *modes* (they determine which information is printed and are
+mutually exclusive):
 
-- **cap**: Capitalizes the term
-- **pl**: Uses the plural form
+- auto: (Default) Shows the form depending on the previous usage.
+  The mode when no other mode is appended with a colon.
 - **both**: Shows "Long Form (Short Form)"
 - **short**: Shows only short form
 - **long**: Shows only long form
 - **def** or **desc**: Shows the description
+- See [the reference](#reference-for-using-glossary-terms)
+  for a complete overview.
+
+Available *modifiers* (they modify how this information is printed):
+
+- **cap**: Capitalizes the term
+- **pl**: Uses the plural form
 - **noref** or **noindex**: Don't show the term in the glossary.
 - **a** or **an**: Include the article (`an` is just an alias of `a`, they're
   equivalent)
 
-Modifiers can be combined with colons:
+Modes and modifiers can be combined with colons:
 
 | **Input**           | **Output**                                                     |
 | ------------------- | -------------------------------------------------------------- |
@@ -209,15 +217,57 @@ want to display it for whatever reason, the second form can be used.
 
 ### First use logic
 
-Any use of the `short`, `long`, or `both` modifier will not count against the
-term's first use.
+The 'mode' of a glossary term determines which information is printed about this
+term. When using a plain `@term`, possibly with some modifiers, the `auto` mode
+is selected. This mode displays the form depending on the usage counter. On the
+first use (`usage counter == 0`), 'both' forms are printed. On subsequent usage
+(`usage counter > 0`) the 'short' form is printed.
 
-This is useful, for example, when you want to use a term in a heading or a
-caption. In that case, your term might end up in an `outline()` at the top of
+Not all occurrences of a term are counted towards its usage, this depends on
+the mode of the term.
+They are documented in the [reference tables](#reference-for-using-glossary-terms).
+
+This control over the usage counter is practical, for example, when you want to
+use a term in a heading or a caption.
+In that case, your term might end up in an `outline()` at the top of
 your document. Normally you don't want that to count as a term's first real use.
 Normally you want that to happen in the body of your document. So, by using
-these modifiers in such situations, you can not only specify exactly how you
-want your term to appear, but also control whether it counts as a "first use".
+the appropriate mode in such situations, you can not only specify
+exactly how you want your term to appear, but also control whether it counts
+as a "first use".
+
+### Reference for Using Glossary Terms
+
+A reference about
+- the different 'modes' and how they determine which information is printed about a term
+- the impact of modes on the [usage counter and ensuing first use behaviour](#first-use-logic)
+- how modifiers impact the presentation of the information printed
+
+A glossary term can display different types of information, which is determined
+by the 'mode' in which it is printed. These modes are all mutually exclusive.
+
+| Mode          | Utilization         | Default first use behaviour | Description |
+| ------------- | ------------------- | --------------------------- | ----------- |
+| `auto`        | `@term`             | use       | The default mode when no 'mode' modifier or supplement is specified. The form depends on the first use counter. |
+| `both`        | `:both`             | no-use    | Shows both forms of the term, by default ([see `format-term`](#customizing-term-display)) like "Long Form (Short Form)". |
+| `short`       | `:short`            | no-use    | Shows only short form.        |
+| `long`        | `:long`             | no-use    | Shows only long form.         |
+| `description` | `:def` <br> `:desc` | no-use    | Shows the description (None of the modifiers apply here & no link is created towards the glossary). |
+| `supplement`  | `[content]`         | use       | Shows the content given by [the supplement](#overriding-term-text). |
+
+Minor modifications to how these different types of information are printed or
+linked, are controlled by the 'modifiers'.
+They do not influence the default first use behaviour of the mode (except `noindex`).
+Moreover, they neatly compose together
+and with most modes (some exceptions exists, but will print a clear error -
+report a bug if not).
+
+| Modifier                       | Description                                                            |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `:cap`                         | Capitalizes the term                                                   |
+| `:pl`                          | Uses the plural form                                                   |
+| `:noref` <br> `:noindex`       | Don't show the term in the glossary (i.e. no page will be linked - a link from the term towards the glossary is always provided.) AND don't count towards the usage counter. |
+| `:a`<br>`a:`<br>`:an`<br>`an:` | Include the article (`an` is just an alias of `a`, they're equivalent) |
 
 ### Generating the Glossary
 
