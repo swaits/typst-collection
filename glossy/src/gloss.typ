@@ -227,7 +227,7 @@
 #let __gls(key, modes-modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
   let possible_modes = ("auto", "both", "short", "long", "description", "supplement")
   // ---------------------------------------------------------------------------
-  // Normalize mode & modifier inputs AND first sanitization
+  // Normalize mode & modifier inputs AND check if the modifiers are valid
   // ---------------------------------------------------------------------------
   let modes-modifiers = modes-modifiers.map(it => {
     if it == "def" or it == "desc" {
@@ -240,11 +240,12 @@
       return "no-use"
     } else if it == "noref" or it == "noindex" {
       return "noindex"
-    } else if it in ("auto", "supplement", "__MIDDLE_ITEM")  {
-      // Already internally used, don't make user input confuse us
-      panic(it, "should not be used as a modifier")
-    } else {
+    } else if it in ("both", "short", "long", "cap", "pl",) {
       return it
+    } else if it in ("auto", "description", "supplement") {
+      panic(it, "is a valid mode, but is not used by applying a modifier with this name. Read the documentation.")
+    } else {
+      panic(it, "is not a recognized mode or modifier.")
     }
   })
   if display-text != none and display-text != auto {

@@ -411,3 +411,5 @@ This project is licensed under the MIT License.
   now counts towards the first use of a term.
 - **Breaking**: When multiple conflicting modes are supplied (like 'short'
   and 'long'), glossy now throws an error (with a clear message).
+- **Breaking**: When an unrecognized modifier is supplied with the term,
+  glossy will now panic instead of ignoring the modifier.
