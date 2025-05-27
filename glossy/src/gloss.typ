@@ -237,7 +237,7 @@
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
 #let __gls(key, modes-modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
-  let possible_modes = ("auto", "both", "short", "long", "description", "supplement", "reset")
+  let possible_modes = ("auto", "both", "short", "long", "supplement", "description", "reset")
   // ---------------------------------------------------------------------------
   // Normalize mode & modifier inputs AND check if the modifiers are valid
   // ---------------------------------------------------------------------------
@@ -388,63 +388,38 @@
     }
   }
 
-  // determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available):
-  // Decides which mode ("short", "long", or "both") to use.
-  // Preference is given to explicit modifiers. If the requested mode can't be fulfilled due to no long form,
-  // fall back to "short".
-  // If no explicit mode is given, the default behavior is:
-  //   - On first use and if a long form exists, "both".
-  //   - Otherwise, "short".
-  let determine_mode = (wants_both, wants_long, wants_short, is_first_use, long_available) => {
-    if wants_both {
-      // Explicit request for "both":
-      // If a long form exists, use "both", otherwise fall back to "short".
-      if long_available {
-        "both"
-      } else {
-        "short"
-      }
-    } else if wants_long {
-      // Explicit request for "long":
-      // If a long form exists, use "long", otherwise fall back to "short".
-      if long_available {
-        "long"
-      } else {
-        "short"
-      }
-    } else if wants_short {
-      // Explicit request for "short":
-      // Always "short" regardless of availability.
-      "short"
-    } else {
-      // No explicit mode given:
-      // On first use with a long form available, default to "both".
-      // Otherwise, use "short".
-      if is_first_use and long_available {
-        "both"
-      } else {
-        "short"
-      }
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // Determine desired options based on modifiers and entry.long availability
   // ---------------------------------------------------------------------------
-  let wants_both = requested_mode == "both"
-  let wants_long = requested_mode == "long"
-  let wants_short = requested_mode == "short"
-  let long_available = entry.long != none
+  // Decide which mode ("short", "long", or "both" or "supplement") to use.
+  // If the requested mode can't be fulfilled due to no long form, fall back to "short".
+  // If no explicit mode is given (i.e. we are in 'auto' mode), the default behavior is:
+  //   - On first use and if a long form exists, "both".
+  //   - Otherwise, "short".
+  if requested_mode == "auto" {
+    // Set requested_mode to automatically determined mode
+    requested_mode = if is_first_use {
+      "both"
+    } else {
+      "short"
+    }
+  }
 
-  // Determine mode using the helper function
-  let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available)
+  let long_available = entry.long != none
+  let mode = if (requested_mode == "both" or requested_mode == "long") and not long_available {
+    // The fall back case, because long form is not available, but it is requested
+    "short"
+  } else {
+    // No fall back needed, the requested mode can be fulfilled
+    requested_mode
+  }
 
   // Pluralize (if requested)
   let short-form = pluralize_term(entry.short, entry.plural)
   let long-form = pluralize_term(entry.long, entry.longplural) // `none` safe here
 
   // Apply format-term() to get the term
-  let formatted-term = if requested_mode == "supplement" {
+  let formatted-term = if mode == "supplement" {
     // Display text was overriden by user, just accept it (string or content)
     display-text
   } else {
