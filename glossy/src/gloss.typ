@@ -224,17 +224,60 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
+#let __gls(key, modes-modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
+  let possible_modes = ("auto", "both", "short", "long", "description", "supplement")
   // ---------------------------------------------------------------------------
-  // Check for illegal modifier combinations
+  // Normalize mode & modifier inputs AND first sanitization
   // ---------------------------------------------------------------------------
-  if ("def" in modifiers or "desc" in modifiers) and modifiers.len() > 1 {
-    panic("Cannot use 'def'/'desc' with other modifiers.")
+  let modes-modifiers = modes-modifiers.map(it => {
+    if it == "def" or it == "desc" {
+      return "description"
+    } else if it == "a" or it == "an" {
+      return "an"
+    } else if it == "use" or it == "spend" {
+      return "use"
+    } else if it == "nouse" or it == "nospend" {
+      return "no-use"
+    } else if it == "noref" or it == "noindex" {
+      return "noindex"
+    } else if it in ("auto", "supplement", "__MIDDLE_ITEM")  {
+      // Already internally used, don't make user input confuse us
+      panic(it, "should not be used as a modifier")
+    } else {
+      return it
+    }
+  })
+  if display-text != none and display-text != auto {
+    // A supplement is provided, thus the mode is "supplement"
+    modes-modifiers.push("supplement")
   }
-  if ("a" in modifiers or "an" in modifiers) and ("pl" in modifiers) {
+
+  // ---------------------------------------------------------------------------
+  // Determine the requested modes (plural) and the modifier array
+  // ---------------------------------------------------------------------------
+  modes-modifiers.push("__MIDDLE_ITEM") // unused modifier
+  let (requested_modes, modifiers) = modes-modifiers.sorted(key: it => {
+    if it in possible_modes {
+      // It is a 'mode'
+      return -1
+    } else if it == "__MIDDLE_ITEM" {
+      return 0
+    } else {
+      // It is a 'modifier'
+      return 1
+    }
+  }).split("__MIDDLE_ITEM")
+
+  // ---------------------------------------------------------------------------
+  // Check for illegal mode and/or modifier combinations
+  // ---------------------------------------------------------------------------
+  if "description" in requested_modes and modifiers.len() > 0 {
+    panic("Cannot use mode 'def'/'desc' with other modifiers.")
+  }
+  if "an" in modifiers and "pl" in modifiers {
     panic("Cannot use 'a'/'an' and 'pl' together.")
   }
-  if ("use" in modifiers or "spend" in modifiers) and ("nouse" in modifiers or "nospend" in modifiers) {
+  if "use" in modifiers and "no-use" in modifiers {
     panic("Cannot use 'use'/'spend' and 'nouse'/'nospend' together.")
   }
 
@@ -244,9 +287,18 @@
   let entry = __get_entry(key)
 
   // ---------------------------------------------------------------------------
-  // If "def" or "desc" modifier is present, show the entry's description immediately
+  // Determine the requested mode (singular)
   // ---------------------------------------------------------------------------
-  if "def" in modifiers or "desc" in modifiers {
+  let requested_mode = if requested_modes.len() == 0 {
+    "auto"
+  } else {
+    requested_modes.at(0)
+  }
+
+  // ---------------------------------------------------------------------------
+  // If mode is "description", show the entry's description immediately
+  // ---------------------------------------------------------------------------
+  if requested_mode == "description" {
     if entry.description == none {
       panic("Use of 'def'/'desc' requires a description be defined.")
     }
@@ -257,12 +309,10 @@
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
-  let default-count-as-first-use = ("short" not in modifiers // mode is not short
-                                and "long" not in modifiers  // mode is not long
-                                and (display-text == none or display-text == auto)) // mode is not supplement
-  let force-count-as-first-use = ("use" in modifiers or "spend" in modifiers)
-  let force-skip-as-first-use = ("nouse" in modifiers or "nospend" in modifiers)
-  let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
+  let default-count-as-first-use = (requested_mode == "auto" or requested_mode == "both")
+  let force-count-as-first-use = "use" in modifiers
+  let force-skip-as-first-use = "no-use" in modifiers
+  let wants_reference = "noindex" not in modifiers
   __mark_term_used(key, wants_reference, force-count-as-first-use
                                          or (not force-skip-as-first-use and default-count-as-first-use))
 
@@ -301,7 +351,7 @@
   //   - If mode is "long" or "both", return the long article.
   // The calling logic ensures that when mode = "long" or "both", a long form exists.
   let get_article = (mode) => {
-    let wants_article = "a" in modifiers or "an" in modifiers
+    let wants_article = "an" in modifiers
     if not wants_article {
       none
     } else if mode == "short" {
@@ -355,9 +405,9 @@
   // ---------------------------------------------------------------------------
   // Determine desired options based on modifiers and entry.long availability
   // ---------------------------------------------------------------------------
-  let wants_both = "both" in modifiers
-  let wants_long = "long" in modifiers
-  let wants_short = "short" in modifiers
+  let wants_both = "both" in requested_modes
+  let wants_long = "long" in requested_modes
+  let wants_short = "short" in requested_modes
   let long_available = entry.long != none
 
   // Determine mode using the helper function
@@ -368,7 +418,7 @@
   let long-form = pluralize_term(entry.long, entry.longplural) // `none` safe here
 
   // Apply format-term() to get the term
-  let formatted-term = if display-text != none and display-text != auto {
+  let formatted-term = if requested_mode == "supplement" {
     // Display text was overriden by user, just accept it (string or content)
     display-text
   } else {
@@ -551,7 +601,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, display-text: supplement)
+      __gls(key, modes-modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, display-text: supplement)
     } else {
       // Not one of ours, so just pass it through
       r
