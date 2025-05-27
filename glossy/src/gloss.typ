@@ -186,6 +186,18 @@
   c.at(0) > 0
 }
 
+// Reset the first use counter to 0
+//
+// Parameters:
+//   key (string): The glossary entry key
+//
+// Returns:
+//   none: Updates state as a side effect
+//
+#let __reset_term_first_used(key, location: none) = {
+  counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).update(0)
+}
+
 // Determine if the glossary contains a visible entry
 //
 // Parameters:
@@ -225,7 +237,7 @@
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
 #let __gls(key, modes-modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
-  let possible_modes = ("auto", "both", "short", "long", "description", "supplement")
+  let possible_modes = ("auto", "both", "short", "long", "description", "supplement", "reset")
   // ---------------------------------------------------------------------------
   // Normalize mode & modifier inputs AND check if the modifiers are valid
   // ---------------------------------------------------------------------------
@@ -240,7 +252,7 @@
       return "no-use"
     } else if it == "noref" or it == "noindex" {
       return "noindex"
-    } else if it in ("both", "short", "long", "cap", "pl",) {
+    } else if it in ("both", "short", "long", "reset", "cap", "pl") {
       return it
     } else if it in ("auto", "description", "supplement") {
       panic(it, "is a valid mode, but is not used by applying a modifier with this name. Read the documentation.")
@@ -278,6 +290,9 @@
   if "description" in requested_modes and modifiers.len() > 0 {
     panic("Cannot use mode 'def'/'desc' with other modifiers.")
   }
+  if "reset" in requested_modes and modifiers.len() > 0 {
+    panic("Cannot use mode 'reset' with other modifiers.")
+  }
   if "an" in modifiers and "pl" in modifiers {
     panic("Cannot use 'a'/'an' and 'pl' together.")
   }
@@ -307,6 +322,13 @@
       panic("Use of 'def'/'desc' requires a description be defined.")
     }
     return show-term([#entry.description])
+  }
+  // ---------------------------------------------------------------------------
+  // If mode is "reset", reset the (first) usage counter and return immediately
+  // ---------------------------------------------------------------------------
+  if requested_mode == "reset" {
+    __reset_term_first_used(key)
+    return
   }
 
   // ---------------------------------------------------------------------------
