@@ -271,6 +271,9 @@
   // ---------------------------------------------------------------------------
   // Check for illegal mode and/or modifier combinations
   // ---------------------------------------------------------------------------
+  if requested_modes.len() > 1 {
+    panic("Cannot mix modes ", requested_modes, ", pick one.")
+  }
   if "description" in requested_modes and modifiers.len() > 0 {
     panic("Cannot use mode 'def'/'desc' with other modifiers.")
   }
@@ -405,9 +408,9 @@
   // ---------------------------------------------------------------------------
   // Determine desired options based on modifiers and entry.long availability
   // ---------------------------------------------------------------------------
-  let wants_both = "both" in requested_modes
-  let wants_long = "long" in requested_modes
-  let wants_short = "short" in requested_modes
+  let wants_both = requested_mode == "both"
+  let wants_long = requested_mode == "long"
+  let wants_short = requested_mode == "short"
   let long_available = entry.long != none
 
   // Determine mode using the helper function

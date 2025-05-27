@@ -293,14 +293,25 @@ This document tries all reference forms and modifiers on a large set of terms.
 
 == Conflicting multiple modifiers combined (short, long, both together)
 
-- @tps:short:long
-- @tps:short:both
-- @tps:long:both
-- @tps:short:long:both
-- @html:both:long:short
-- @doc:long:short
-- @cpu:both:long:short
-- @api:short:long:both
+Assert that a panic occurs.
+#import "/src/gloss.typ": __gls, __default-format-term
+#let manual-gls(key, mods) = __gls(key, modes-modifiers: mods, format-term: __default-format-term, show-term: (body) => [#strong(body)], term-links: false, display-text: none)
+//- @tps:short:long
+#assert-panic(manual-gls.with("tps", ("short", "long")))
+//- @tps:short:both
+#assert-panic(manual-gls.with("tps", ("short", "both")))
+//- @tps:long:both
+#assert-panic(manual-gls.with("tps", ("long", "both")))
+//- @tps:short:long:both
+#assert-panic(manual-gls.with("tps", ("short", "long", "both")))
+//- @html:both:long:short
+#assert-panic(manual-gls.with("html", ("both", "long", "short")))
+//- @doc:long:short
+#assert-panic(manual-gls.with("doc", ("long", "short")))
+//- @cpu:both:long:short
+#assert-panic(manual-gls.with("cpu", ("both", "long", "short")))
+//- @api:short:long:both
+#assert-panic(manual-gls.with("api", ("short", "long", "both")))
 
 == Combining capitalization and plural with short/long/both
 

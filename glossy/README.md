@@ -409,3 +409,5 @@ This project is licensed under the MIT License.
   in your custom theme to keep the previous behaviour.
 - **Breaking**: The `both` mode (previously called modifier) by default
   now counts towards the first use of a term.
+- **Breaking**: When multiple conflicting modes are supplied (like 'short'
+  and 'long'), glossy now throws an error (with a clear message).
