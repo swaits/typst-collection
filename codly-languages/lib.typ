@@ -18,7 +18,7 @@
       baseline: 0.05em,
       inset: 0pt,
       outset: 0pt,
-    ) + h(0.3em)
+    )
   }
 
   let __emoji(emoji) = {
@@ -26,7 +26,7 @@
       emoji,
       inset: 0pt,
       outset: 0pt,
-    ) + h(0.3em)
+    )
   }
 
   // configurations for languages
