@@ -31,6 +31,12 @@
       [. #entry.description]
     }
 
+    let reference = if entry.reference == none {
+      []
+    } else {
+      [ #cite(label(entry.reference))]
+    }
+
     block(
       below: 1em,
       text(
@@ -39,7 +45,7 @@
           grid(
             columns: (1fr, auto),
             gutter: 0.75em,
-            [#short-display#long-display#description#entry.label],
+            [#short-display#long-display#description#reference#entry.label],
             text(fill: rgb("#666666"), entry.pages)
           )
         }

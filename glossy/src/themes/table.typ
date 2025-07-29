@@ -27,6 +27,10 @@
   },
 
   entry: (entry, index, total) => {
-    (entry.short + entry.label, entry.long, entry.description, entry.pages)
+    if entry.reference == none {
+      (entry.short + entry.label, entry.long, entry.description, entry.pages)
+    } else {
+      (entry.short + entry.label, entry.long, [#entry.description #cite(label(entry.reference))], entry.pages)
+    }
   }
 )

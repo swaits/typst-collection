@@ -59,7 +59,8 @@
     longplural: entry.at("longplural", default: __pluralize(long)),
     longarticle: entry.at("longarticle", default: __determine_article(long)),
     description: entry.at("description", default: none),
-    group: entry.at("group", default: "")
+    group: entry.at("group", default: ""),
+    reference: entry.at("reference", default: none)
   )
 }
 
@@ -671,6 +672,7 @@
           short: entry.at("short"),
           long: entry.at("long"),
           description: entry.at("description"),
+          reference: entry.at("reference"),
           label: [#metadata(key)#__entry_label(key)],
           pages: __create_backlinks(key)
         ))

@@ -10,6 +10,7 @@
       longplural: z.content(optional: true),
       description: z.content(optional: true),
       group: z.content(optional: true),
+      reference: z.content(optional: true)
     )
   )
 )
