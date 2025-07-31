@@ -31,10 +31,15 @@
       [. #entry.description]
     }
 
+    // Format the reference
     let reference = if entry.reference == none {
       []
     } else {
-      [ #cite(label(entry.reference))]
+      if entry.reference.supplement == none {
+        [ #cite(label(entry.reference.key))]
+      } else {
+        [ #cite(label(entry.reference.key), supplement: entry.reference.supplement)]
+      }
     }
 
     block(

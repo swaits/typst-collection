@@ -33,7 +33,11 @@
     let reference = if entry.reference == none {
       []
     } else {
-      text(style: "italic", [ #cite(label(entry.reference))])
+      if entry.reference.supplement == none {
+        text(style: "italic", [ #cite(label(entry.reference.key))])
+      } else {
+        text(style: "italic", [ #cite(label(entry.reference.key), supplement: entry.reference.supplement)])
+      }
     }
 
     block(

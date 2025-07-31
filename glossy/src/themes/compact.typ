@@ -68,11 +68,16 @@
       text(size: 0.65em, [· #entry.description])
     }
 
+
     // Format the reference
     let reference = if entry.reference == none {
       []
     } else {
-      [ #cite(label(entry.reference))]
+      if entry.reference.supplement == none {
+        text(size: 0.65em, [ #cite(label(entry.reference.key))])
+      } else {
+        text(size: 0.65em, [ #cite(label(entry.reference.key), supplement: entry.reference.supplement)])
+      }
     }
 
     // Create the complete entry with tight spacing
