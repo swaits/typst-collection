@@ -69,6 +69,10 @@ Use the `init-glossary` function to initialize glossary entries:
       // Optional: Override automatic pluralization
       plural: "TPSes",
       longplural: "test procedure specifications"
+      reference: (
+        key: "doe2025",
+        supplement: "p. 42" // Supplement is optional
+      )
     ),
     WWW: "World Wide Web", // concise entry with only short: long
 )
@@ -116,6 +120,9 @@ tps:
   description: A formal document describing test steps and expected results
   plural: TPSes
   longplural: test procedure specifications
+  reference:
+    key: "doe2025"
+    supplement: "p. 42" # Supplement is optional
 
 WWW: World Wide Web
 ```
@@ -314,6 +321,9 @@ Entry fields available to themes:
 - `description`: Term description (can be `none`)
 - `label`: Term's dictionary label
 - `pages`: Linked page numbers where term appears
+- `reference`: Literature for glossary definitions
+  - `key`: The bibtex key of the literature
+  - `supplement`: Added supplement, like a page
 
 **NOTE:** If the theme does not emit `entry.label`, linking form terms to their
 glossary entry will not work.
