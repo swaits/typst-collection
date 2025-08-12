@@ -315,7 +315,7 @@ Entry fields available to themes:
 - `label`: Term's dictionary label
 - `pages`: Linked page numbers where term appears
 
-**NOTE:** If the theme does not emit `entry.label`, linking form terms to their
+**NOTE:** If the theme does not emit `entry.label`, linking from terms to their
 glossary entry will not work.
 
 ## License
