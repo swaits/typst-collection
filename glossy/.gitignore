@@ -1,2 +1,3 @@
-tests/**/out/
+build/
 tests/**/diff/
+tests/**/out/
