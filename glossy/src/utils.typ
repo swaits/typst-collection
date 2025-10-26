@@ -16,8 +16,8 @@
   }
 
   // Helper functions for checking endings
-  let ends_with = (suffix) => lower(word).ends-with(suffix)
-  let ends_with_any = (suffixes) => suffixes.any((suffix) => ends_with(suffix))
+  let ends_with = suffix => lower(word).ends-with(suffix)
+  let ends_with_any = suffixes => suffixes.any(suffix => ends_with(suffix))
 
   // Map of irregular plurals for common words
   let irregulars = (
@@ -80,7 +80,18 @@
   // Irregular suffixes
   let f_to_ves = ("leaf", "loaf", "calf", "half", "wolf", "thief")
   let fe_to_ves = ("wife", "knife", "life")
-  let o_to_os = ("photo", "piano", "halo", "radio", "video", "studio", "solo", "taco", "memo", "zero")
+  let o_to_os = (
+    "photo",
+    "piano",
+    "halo",
+    "radio",
+    "video",
+    "studio",
+    "solo",
+    "taco",
+    "memo",
+    "zero",
+  )
 
   // Convenience
   let w = lower(word)
@@ -123,7 +134,7 @@
   } else if ends_with("is") {
     word.slice(0, -2) + "es"
   } else if ends_with("on") {
-      word + "s"
+    word + "s"
   } else if ends_with("o") {
     if o_to_os.contains(w) {
       word + "s"
@@ -203,7 +214,7 @@
 
   if is_acronym {
     // Use acronym rules
-    let first_char = upper_word.codepoints().slice(0,1).first()
+    let first_char = upper_word.codepoints().slice(0, 1).first()
     if acronym_vowels.contains(first_char) {
       "an"
     } else {
@@ -211,17 +222,17 @@
     }
   } else {
     // Non-acronym rules
-    let first_char = lower_word.codepoints().slice(0,1).first()
+    let first_char = lower_word.codepoints().slice(0, 1).first()
 
     // Special cases for words matching a set of known 'silent h' prefixes
     let silent_h_words = (
-      "heir",   // "air"
-      "herb",   // "erb" (in American English)
+      "heir", // "air"
+      "herb", // "erb" (in American English)
       "homage", // "oh-mij" or "ah-mij"
       "honest", // "on-est"
-      "honor",  // "on-or" (American English)
+      "honor", // "on-or" (American English)
       "honour", // "on-our" (British English)
-      "hour",   // "our"
+      "hour", // "our"
     )
     if silent_h_words.any(w => lower_word.starts-with(w)) {
       return "an"
@@ -235,15 +246,15 @@
     // Words starting with 'u', that get the 'yoo' sound
     if first_char == "u" {
       let yoo_sounds = (
-        "ubi",  // ubiquitous
-        "uni",  // unicycle, uniform, universe, university, unilateral, unique, union, etc.
-        "usa",  // usage, usability
-        "use",  // use, useful, useless
-        "usu",  // usual, usually
+        "ubi", // ubiquitous
+        "uni", // unicycle, uniform, universe, university, unilateral, unique, union, etc.
+        "usa", // usage, usability
+        "use", // use, useful, useless
+        "usu", // usual, usually
         "usur", // usurp
-        "ute",  // utensil, uterus
-        "uti",  // utility, utilize, utilization
-        "uto",  // utopia, utopian
+        "ute", // utensil, uterus
+        "uti", // utility, utilize, utilization
+        "uto", // utopia, utopian
       )
       if yoo_sounds.any(w => lower_word.starts-with(w)) {
         return "a"

@@ -2,10 +2,10 @@
 
 // Our test glossary
 #show: init-glossary.with((
-    Normal: "this is a normal term",
-    NoRef: "this term is noref'd",
-    NoIndex: "this term is noindex'd",
-    NoRefNoIndex: "this term is noref'd and noindex'd",
+  Normal: "this is a normal term",
+  NoRef: "this term is noref'd",
+  NoIndex: "this term is noindex'd",
+  NoRefNoIndex: "this term is noref'd and noindex'd",
 ))
 
 // Configure styling

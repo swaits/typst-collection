@@ -12,22 +12,22 @@ Reference: @pbr, @zbuffer
 ]
 
 #t("abbreviations")                   // "string" : str
-#t(("abbreviations"))                 // ("string") : str
+#t("abbreviations")                 // ("string") : str
 #t(("abbreviations",))                // ("string",) : array(str)
-#t(("abbreviations","abbreviations")) // ("string","string",) : array(str)
+#t(("abbreviations", "abbreviations")) // ("string","string",) : array(str)
 
 #pagebreak(weak: true)
 
 #t("")                                // empty string should be the empty group
-#t((""))                              // empty string should be the empty group
+#t("")                              // empty string should be the empty group
 #t(("",))                             // empty string should be the empty group
-#t(("",""))                           // empty string should be the empty group
+#t(("", ""))                           // empty string should be the empty group
 
 #pagebreak(weak: true)
 
 #t(none)                              // none should be all groups
-#t((none))                            // none should be all groups
+#t(none)                            // none should be all groups
 
 #pagebreak(weak: true)
 
-#t(("abbreviations",none))            // try to get both groups
+#t(("abbreviations", none))            // try to get both groups

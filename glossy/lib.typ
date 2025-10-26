@@ -1,2 +1,2 @@
-#import "src/gloss.typ": init-glossary, glossary
+#import "src/gloss.typ": glossary, init-glossary
 #import "src/themes.typ": *

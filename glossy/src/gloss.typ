@@ -59,7 +59,7 @@
     longplural: entry.at("longplural", default: __pluralize(long)),
     longarticle: entry.at("longarticle", default: __determine_article(long)),
     description: entry.at("description", default: none),
-    group: entry.at("group", default: "")
+    group: entry.at("group", default: ""),
   )
 }
 
@@ -149,7 +149,9 @@
     counter(__gloss_label_prefix + key).step()
   }
   if count-as-first-use {
-    counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).step()
+    counter(
+      __gloss_label_prefix + key + __gloss_first_use_counter_postfix,
+    ).step()
   }
 }
 
@@ -164,7 +166,7 @@
 //
 #let __is_term_ever_referenced(key, location: none) = {
   let c = counter(__gloss_label_prefix + key)
-  c = if location == none {c.final()} else {c.at(location)}
+  c = if location == none { c.final() } else { c.at(location) }
   c.at(0) > 0
 }
 
@@ -181,8 +183,10 @@
 //   boolean: If the entry is used above the location in the document
 //
 #let __is_term_first_used(key, location: none) = {
-  let c = counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix)
-  c = if location == none {c.final()} else {c.at(location)}
+  let c = counter(
+    __gloss_label_prefix + key + __gloss_first_use_counter_postfix,
+  )
+  c = if location == none { c.final() } else { c.at(location) }
   c.at(0) > 0
 }
 
@@ -195,7 +199,9 @@
 //   none: Updates state as a side effect
 //
 #let __reset_term_first_used(key, location: none) = {
-  counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).update(0)
+  counter(
+    __gloss_label_prefix + key + __gloss_first_use_counter_postfix,
+  ).update(0)
 }
 
 // Determine if the glossary contains a visible entry
@@ -236,8 +242,23 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modes-modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
-  let possible_modes = ("auto", "both", "short", "long", "supplement", "description", "reset")
+#let __gls(
+  key,
+  modes-modifiers: array,
+  format-term: function,
+  show-term: function,
+  term-links: true,
+  display-text: none,
+) = {
+  let possible_modes = (
+    "auto",
+    "both",
+    "short",
+    "long",
+    "supplement",
+    "description",
+    "reset",
+  )
   // ---------------------------------------------------------------------------
   // Normalize mode & modifier inputs AND check if the modifiers are valid
   // ---------------------------------------------------------------------------
@@ -255,7 +276,10 @@
     } else if it in ("both", "short", "long", "reset", "cap", "pl") {
       return it
     } else if it in ("auto", "description", "supplement") {
-      panic(it, "is a valid mode, but is not used by applying a modifier with this name. Read the documentation.")
+      panic(
+        it,
+        "is a valid mode, but is not used by applying a modifier with this name. Read the documentation.",
+      )
     } else {
       panic(it, "is not a recognized mode or modifier.")
     }
@@ -269,17 +293,19 @@
   // Determine the requested modes (plural) and the modifier array
   // ---------------------------------------------------------------------------
   modes-modifiers.push("__MIDDLE_ITEM") // unused modifier
-  let (requested_modes, modifiers) = modes-modifiers.sorted(key: it => {
-    if it in possible_modes {
-      // It is a 'mode'
-      return -1
-    } else if it == "__MIDDLE_ITEM" {
-      return 0
-    } else {
-      // It is a 'modifier'
-      return 1
-    }
-  }).split("__MIDDLE_ITEM")
+  let (requested_modes, modifiers) = modes-modifiers
+    .sorted(key: it => {
+      if it in possible_modes {
+        // It is a 'mode'
+        return -1
+      } else if it == "__MIDDLE_ITEM" {
+        return 0
+      } else {
+        // It is a 'modifier'
+        return 1
+      }
+    })
+    .split("__MIDDLE_ITEM")
 
   // ---------------------------------------------------------------------------
   // Check for illegal mode and/or modifier combinations
@@ -335,12 +361,18 @@
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
-  let default-count-as-first-use = (requested_mode == "auto" or requested_mode == "both")
+  let default-count-as-first-use = (
+    requested_mode == "auto" or requested_mode == "both"
+  )
   let force-count-as-first-use = "use" in modifiers
   let force-skip-as-first-use = "no-use" in modifiers
   let wants_reference = "noindex" not in modifiers
-  __mark_term_used(key, wants_reference, force-count-as-first-use
-                                         or (not force-skip-as-first-use and default-count-as-first-use))
+  __mark_term_used(
+    key,
+    wants_reference,
+    force-count-as-first-use
+      or (not force-skip-as-first-use and default-count-as-first-use),
+  )
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -376,7 +408,7 @@
   //   - If mode is "short", return the short article.
   //   - If mode is "long" or "both", return the long article.
   // The calling logic ensures that when mode = "long" or "both", a long form exists.
-  let get_article = (mode) => {
+  let get_article = mode => {
     let wants_article = "an" in modifiers
     if not wants_article {
       none
@@ -406,7 +438,10 @@
   }
 
   let long_available = entry.long != none
-  let mode = if (requested_mode == "both" or requested_mode == "long") and not long_available {
+  let mode = if (
+    (requested_mode == "both" or requested_mode == "long")
+      and not long_available
+  ) {
     // The fall back case, because long form is not available, but it is requested
     "short"
   } else {
@@ -481,9 +516,13 @@
 //
 #let __create_backlinks(key) = {
   return query(__term_label(key)) // find all reference
-    .map(meta => { // extract location and page number (or symbol)
+    .map(meta => {
+      // extract location and page number (or symbol)
       let loc = meta.location()
-      let page = numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
+      let page = numbering(
+        __default(loc.page-numbering(), "1"),
+        ..counter(page).at(loc),
+      )
       (loc, page)
     })
     .dedup(key: ((loc, page)) => page) // deduplicate by page
@@ -508,14 +547,14 @@
 //   string: The formatted term based on the specified mode.
 //
 #let __default-format-term(mode, short-form, long-form) = {
-    if mode == "short" {
-      short-form
-    } else if mode == "long" {
-      long-form
-    } else {
-      // mode assumed to be "both"
-      long-form + " (" + short-form + ")"
-    }
+  if mode == "short" {
+    short-form
+  } else if mode == "long" {
+    long-form
+  } else {
+    // mode assumed to be "both"
+    long-form + " (" + short-form + ")"
+  }
 }
 
 // Styles a term to control its display in a document.
@@ -559,17 +598,23 @@
   format-term: __default-format-term,
   show-term: __default-show-term,
   term-links: false,
-  body
+  body,
 ) = context {
   // Type checking
   let checked-entries = (:)
   for (key, entry) in entries {
     let checked-key = z.parse(key, z.string(), scope: ("dictionary key",))
-    let checked-entry = z.parse(entry, dict-schema, scope: ("dictionary entry",))
+    let checked-entry = z.parse(entry, dict-schema, scope: (
+      "dictionary entry",
+    ))
     checked-entries.insert(checked-key, checked-entry)
   }
-  let checked-format-term = z.parse(show-term, z.function(), scope: ("format-term",))
-  let checked-show-term = z.parse(show-term, z.function(), scope: ("show-term",))
+  let checked-format-term = z.parse(show-term, z.function(), scope: (
+    "format-term",
+  ))
+  let checked-show-term = z.parse(show-term, z.function(), scope: (
+    "show-term",
+  ))
   let checked-body = z.parse(body, z.content(), scope: ("body",))
 
   // Process and store each glossary entry
@@ -590,7 +635,12 @@
     //  - That "key" does not correspond to an actual entry,
     //  - There is at least one modifier,
     //  - The first modifier corresponds to an existing entry key.
-    let can_swap = (lower(raw_key) == "a" or lower(raw_key) == "an") and not __has_entry(raw_key) and raw_modifiers.len() > 0 and __has_entry(raw_modifiers.first())
+    let can_swap = (
+      (lower(raw_key) == "a" or lower(raw_key) == "an")
+        and not __has_entry(raw_key)
+        and raw_modifiers.len() > 0
+        and __has_entry(raw_modifiers.first())
+    )
 
     // If we can swap, use the first modifier as the key and insert "a" as the first modifier.
     let (key, modifiers) = if can_swap {
@@ -602,7 +652,14 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modes-modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, display-text: supplement)
+      __gls(
+        key,
+        modes-modifiers: modifiers.map(lower),
+        format-term: format-term,
+        show-term: show-term,
+        term-links: term-links,
+        display-text: supplement,
+      )
     } else {
       // Not one of ours, so just pass it through
       r
@@ -658,7 +715,9 @@
   // Type checking
   let checked-title = z.parse(title, z.content(), scope: ("title",))
   let checked-groups = z.parse(groups, groups-list-schema, scope: ("groups",))
-  let checked-ignore-case = z.parse(ignore-case, z.boolean(), scope: ("ignore-case",))
+  let checked-ignore-case = z.parse(ignore-case, z.boolean(), scope: (
+    "ignore-case",
+  ))
   let checked-theme = z.parse(theme, theme-schema, scope: ("theme",))
 
   // Collect and organize entries by group
@@ -706,7 +765,7 @@
           long: entry.at("long"),
           description: entry.at("description"),
           label: [#metadata(key)#__entry_label(key)],
-          pages: __create_backlinks(key)
+          pages: __create_backlinks(key),
         ))
       }
     }
@@ -719,7 +778,9 @@
       let sorted_entries = if sort {
         current_entries
           // 1. create array of tuples with (lower [if ignore-case], entry)
-          .map(e => { if ignore-case { (lower(e.short), e) } else { (e.short, e) } })
+          .map(e => {
+            if ignore-case { (lower(e.short), e) } else { (e.short, e) }
+          })
           // 2. sort the tuples (by first element then second)
           .sorted() // NOTE: sorted() is NOT language-aware
           // 3. strip away the tuple's first element, leaving an array of entries
@@ -747,10 +808,10 @@
           output.len(),
           for (i, entry) in entries.enumerate() {
             (checked-theme.entry)(entry, i, entries.len())
-          }
+          },
         )
         group_index += 1
-      }
+      },
     )
   ]
 }

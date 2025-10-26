@@ -37,79 +37,68 @@
     short: "HTML",
     long: "Hypertext Markup Language",
     description: "A standard language for creating web pages",
-    group: "Web"
+    group: "Web",
   ),
-
   css: (
     short: "CSS",
     long: "Cascading Style Sheets",
     description: "A language used for describing the presentation of documents",
-    group: "Web"
+    group: "Web",
   ),
-
   // Term with no description
   js: (
     short: "JS",
     long: "JavaScript",
-    group: "Web"
+    group: "Web",
   ),
-
   // Term with only a short field
   tcp: (
     short: "TCP",
-    group: "Networking"
+    group: "Networking",
   ),
-
   // Term with only a long field
   // should panic!
   //udp: (
   //  long: "User Datagram Protocol",
   //  group: "Networking"
   //),
-
   // Term with short and description, but no long
   ip: (
     short: "IP",
     description: "A unique identifier for a host or network interface",
-    group: "Networking"
+    group: "Networking",
   ),
-
   // Term with custom articles and everything defined
   api: (
     short: "API",
     long: "Application Programming Interface",
     description: "A set of protocols and tools for building software",
-    article: "an",      // custom article for short form
-    longarticle: "an",   // custom article for long form
-    group: "Software"
+    article: "an", // custom article for short form
+    longarticle: "an", // custom article for long form
+    group: "Software",
   ),
-
   // Term starting with a vowel, no custom article, to test default a/an logic
   xml: (
     short: "XML",
     long: "Extensible Markup Language",
     description: "A markup language defining rules for encoding documents",
-    group: "Data"
+    group: "Data",
   ),
-
   // Term starting with a consonant, no custom article
   cpu: (
     short: "CPU",
     long: "Central Processing Unit",
     description: "The primary component of a computer that performs calculations",
-    group: "Hardware"
+    group: "Hardware",
   ),
-
   // Term without any fields (just a string), should be handled gracefully
   bare: "A bare term with no fields",
-
   // Term with only description
   // should panic!
   //desconly: (
   //  description: "Just a description, no short or long",
   //  group: "Misc"
   //),
-
   // Term with article fields but missing short and long (should test fallback)
   // should panic!
   //articonly: (
@@ -118,51 +107,46 @@
   //  description: "Has only articles and a description",
   //  group: "Misc"
   //),
-
   // Term with uppercase key
   SSL: (
     short: "SSL",
     long: "Secure Sockets Layer",
     description: "A protocol for encrypting information over the internet",
-    group: "Security"
+    group: "Security",
   ),
-
   // Term that will not be referenced
   unusedterm: (
     short: "UNUSED",
     long: "Unused Term",
-    description: "Should not appear since it's never referenced"
+    description: "Should not appear since it's never referenced",
   ),
-
   // Term that tests pluralization with custom fields maybe
   doc: (
     short: "doc",
     long: "document",
     description: "A single piece of written matter",
-    group: "Misc"
+    group: "Misc",
   ),
-
   // Terms that might require checking conflicting modifiers
   tps: (
     short: "TPS",
     long: "test procedure specification",
     description: "A document describing test procedures",
-    group: "Testing"
+    group: "Testing",
   ),
-
   // Term that might appear multiple times
   http: (
     short: "HTTP",
     long: "Hypertext Transfer Protocol",
     description: "A protocol for distributed, collaborative, hypermedia information systems",
-    group: "Web"
-  )
+    group: "Web",
+  ),
 )
 
 // Initialize the glossary with a custom show-term callback
 #show: init-glossary.with(
   exhaustiveGlossary,
-  show-term: (body) => [#strong(body)]
+  show-term: body => [#strong(body)],
 )
 
 #set heading(numbering: "1.1")
@@ -294,8 +278,15 @@ This document tries all reference forms and modifiers on a large set of terms.
 == Conflicting multiple modifiers combined (short, long, both together)
 
 Assert that a panic occurs.
-#import "/src/gloss.typ": __gls, __default-format-term
-#let manual-gls(key, mods) = __gls(key, modes-modifiers: mods, format-term: __default-format-term, show-term: (body) => [#strong(body)], term-links: false, display-text: none)
+#import "/src/gloss.typ": __default-format-term, __gls
+#let manual-gls(key, mods) = __gls(
+  key,
+  modes-modifiers: mods,
+  format-term: __default-format-term,
+  show-term: body => [#strong(body)],
+  term-links: false,
+  display-text: none,
+)
 //- @tps:short:long
 #assert-panic(manual-gls.with("tps", ("short", "long")))
 //- @tps:short:both
@@ -348,19 +339,19 @@ Assert that a panic occurs.
 
 #table(
   columns: 3,
-  table.header([*Input*],[*Output*],[*Comment*]),
-  [`@api`         ], [@api],         ["default"],
-  [`@api:short`   ], [@api:short],   ["short only"],
-  [`@api:long`    ], [@api:long],    ["long only"],
-  [`@api:both`    ], [@api:both],    ["both"],
-  [`@api:def`     ], [@api:def],     ["definition (long)"],
-  [`@api:desc`    ], [@api:desc],    ["description"],
-  [`@a:api`       ], [@a:api],       ["article before key"],
-  [`@api:a`        ], [@api:a],       ["article after key"],
-  [`@api:cap`     ], [@api:cap],     ["capitalize"],
-  [`@api:pl`      ], [@api:pl],      ["plural"],
-  [`@api:long:cap`], [@api:long:cap],["long + cap"],
-  [`@api:both:pl` ], [@api:both:pl], ["both + pl"]
+  table.header([*Input*], [*Output*], [*Comment*]),
+  [`@api`         ], [@api], ["default"],
+  [`@api:short`   ], [@api:short], ["short only"],
+  [`@api:long`    ], [@api:long], ["long only"],
+  [`@api:both`    ], [@api:both], ["both"],
+  [`@api:def`     ], [@api:def], ["definition (long)"],
+  [`@api:desc`    ], [@api:desc], ["description"],
+  [`@a:api`       ], [@a:api], ["article before key"],
+  [`@api:a`        ], [@api:a], ["article after key"],
+  [`@api:cap`     ], [@api:cap], ["capitalize"],
+  [`@api:pl`      ], [@api:pl], ["plural"],
+  [`@api:long:cap`], [@api:long:cap], ["long + cap"],
+  [`@api:both:pl` ], [@api:both:pl], ["both + pl"],
 )
 
 == Multiple glossaries with themes and group filtering
@@ -377,25 +368,41 @@ Assert that a panic occurs.
 
 == Networking Only
 
-#glossary(title: "Networking Terms", groups: ("Networking",), theme: theme-basic)
+#glossary(
+  title: "Networking Terms",
+  groups: ("Networking",),
+  theme: theme-basic,
+)
 
 == Misc and Data
 
-#glossary(title: "Misc & Data", groups: ("Misc","Data"), theme: theme-basic)
+#glossary(title: "Misc & Data", groups: ("Misc", "Data"), theme: theme-basic)
 
 == Just Testing terms
 
-#glossary(title: "Testing Terms", groups: ("Testing",), theme: theme-chicago-index)
+#glossary(
+  title: "Testing Terms",
+  groups: ("Testing",),
+  theme: theme-chicago-index,
+)
 
 == Hardware group
 
-#glossary(title: "Hardware Terms", groups: ("Hardware",), theme: theme-chicago-index)
+#glossary(
+  title: "Hardware Terms",
+  groups: ("Hardware",),
+  theme: theme-chicago-index,
+)
 
 == Unreferenced entries
 
-#glossary(title: "Unreferenced (Should Contain Unused?)", groups: ("Security",), theme: theme-chicago-index)
+#glossary(
+  title: "Unreferenced (Should Contain Unused?)",
+  groups: ("Security",),
+  theme: theme-chicago-index,
+)
 
 == Empty group glossary
-#glossary(title: "Empty Group Glossary", groups: (""), theme: theme-basic)
+#glossary(title: "Empty Group Glossary", groups: "", theme: theme-basic)
 
 = End of Brutal Test

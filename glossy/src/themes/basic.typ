@@ -15,7 +15,6 @@
     heading(level: 1, title)
     body
   },
-
   // Renders a group of related glossary terms
   // Parameters:
   //   name: Group name (empty string for ungrouped terms)
@@ -28,7 +27,6 @@
     }
     body
   },
-
   // Renders a single glossary entry with term, definition, and page references
   // Parameters:
   //   entry: Dictionary containing term data:
@@ -62,9 +60,9 @@
         left: 1em,
         bottom: 0.5em,
         block(
-          [#term#entry.label#long-form#description #h(1em) (pp. #entry.pages.join(", "))]
-        )
-      )
+          [#term#entry.label#long-form#description #h(1em) (pp. #entry.pages.join(", "))],
+        ),
+      ),
     )
   },
 )

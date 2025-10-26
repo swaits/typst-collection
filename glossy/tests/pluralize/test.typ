@@ -294,11 +294,11 @@
   if result != expected {
     panic(
       "Pluralization failed for: "
-      + (if singular == none { "none" } else { str(singular) })
-      + ". Expected: "
-      + (if expected == none { "none" } else { str(expected) })
-      + ", got: "
-      + (if result == none { "none" } else { str(result) })
+        + (if singular == none { "none" } else { str(singular) })
+        + ". Expected: "
+        + (if expected == none { "none" } else { str(expected) })
+        + ", got: "
+        + (if result == none { "none" } else { str(result) }),
     )
   }
 }

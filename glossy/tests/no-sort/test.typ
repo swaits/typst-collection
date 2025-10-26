@@ -1,4 +1,4 @@
-#import "/lib.typ":*
+#import "/lib.typ": *
 
 #show: init-glossary.with(yaml("glossary.yml"))
 

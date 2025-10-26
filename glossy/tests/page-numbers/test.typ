@@ -20,7 +20,7 @@
   tps: (
     short: "TPS",
     long: "test procedure specification",
-    description: "A document on how to run all the test procedures"
+    description: "A document on how to run all the test procedures",
   ),
 )
 

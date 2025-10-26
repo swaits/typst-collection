@@ -19,7 +19,7 @@
     This should be a link, too: @WWW
 
     #glossary()
-  ]
+  ],
 )
 
 // -----------------------------------------------------------------------------
@@ -41,5 +41,5 @@
     This should be a link, too: @ML
 
     #print-glossary(entry-list)
-  ]
+  ],
 )

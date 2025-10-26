@@ -15,7 +15,6 @@
     heading(level: 1, title)
     columns(2, body)
   },
-
   // Renders a group of related glossary terms
   // Parameters:
   //   name: Group name (empty string for ungrouped terms)
@@ -28,7 +27,6 @@
     }
     body
   },
-
   // Renders a single glossary entry with term, definition, and page references
   // Parameters:
   //   entry: Dictionary containing term data:
@@ -60,13 +58,17 @@
       size: 0.75em,
       weight: "light",
       grid(
-        columns: (auto,1fr,1em,auto),
+        columns: (auto, 1fr, 1em, auto),
         align: (left, center, center, right),
-        [#short-display#entry.label#long-display#description],  // Term with label
-        [#repeat(h(0.25em) + "." + h(0.25em))],  // Dotted leader line
-        [ . ], // A 1em wide dot so we definitely get some break between term and pages
-        [#entry.pages.join(", ")]                 // Page references
-      )
+        [#short-display#entry.label#long-display#description],
+        // Term with label
+        [#repeat(h(0.25em) + "." + h(0.25em))],
+        // Dotted leader line
+        [ . ],
+        // A 1em wide dot so we definitely get some break between term and pages
+        [#entry.pages.join(", ")],
+        // Page references
+      ),
     )
   },
 )
