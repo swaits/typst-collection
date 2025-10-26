@@ -32,7 +32,7 @@
 
     [@html:short],      [@html:long],      [@html:both],
     [@css:short],       [@css:long],       [@css:both],
-    [@tps:short],       [@tps:long],       [@tps:both],
+    [@tps:short],       [@tps:long],       [@tps:both:nouse],
     [@concise:short],   [@concise:long],   [@concise:both],
     [@shortonly:short], [@shortonly:long], [@shortonly:both],
 
@@ -40,7 +40,7 @@
 
     [@html:short:cap],        [@html:long:cap],        [@html:both:cap],
     [@a:css:short],           [@a:css:long],           [@a:css:both],
-    [@tps:short:pl],          [@tps:long:pl],          [@tps:both:pl],
+    [@tps:short:pl],          [@tps:long:pl],          [@tps:both:nouse:pl],
     [@concise:a:cap:short],   [@concise:a:cap:long],   [@concise:a:cap:both],
     [@an:shortonly:short],    [@an:shortonly:long],    [@an:shortonly:both],
   )

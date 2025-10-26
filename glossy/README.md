@@ -128,7 +128,8 @@ And then loaded during initialization as follows:
 
 `init-glossary()` supports the following parameters:
 
-- `format-term` // TODO: document this
+- `format-term` // Function deciding how to format a term, depending on
+  the 'mode' (short, long, both). See example below.
 - `show-term` // Function which can customize display of a term (see example below)
 - `term-links: false` // True if you want terms to link to their glossary entry
 
@@ -141,19 +142,27 @@ In modern web development, languages like @html and @css are essential.
 The @tps:pl need to be submitted by Friday.
 ```
 
-Available modifiers:
+Available *modes* (they determine which information is printed and are
+mutually exclusive):
 
-- **cap**: Capitalizes the term
-- **pl**: Uses the plural form
+- auto: (Default) Shows the form depending on the previous usage.
+  The mode when no other mode is appended with a colon.
 - **both**: Shows "Long Form (Short Form)"
 - **short**: Shows only short form
 - **long**: Shows only long form
 - **def** or **desc**: Shows the description
+- See [the reference](#reference-for-using-glossary-terms)
+  for a complete overview.
+
+Available *modifiers* (they modify how this information is printed):
+
+- **cap**: Capitalizes the term
+- **pl**: Uses the plural form
 - **noref** or **noindex**: Don't show the term in the glossary.
 - **a** or **an**: Include the article (`an` is just an alias of `a`, they're
   equivalent)
 
-Modifiers can be combined with colons:
+Modes and modifiers can be combined with colons:
 
 | **Input**           | **Output**                                                     |
 | ------------------- | -------------------------------------------------------------- |
@@ -198,21 +207,71 @@ which would normally render as something like "test procedure specification."
 But for some reason you want it to actually say "an annoying report." You can do
 that like this:
 
-| **Input**                 | **Output**           |
-| ------------------------- | -------------------- |
-| `@tps[an annoying report` | "an annoying report" |
+| **Input**                  | **Output**           |
+| -------------------------- | -------------------- |
+| `@tps[an annoying report]` | "an annoying report" |
+| `@tps[]`                   | #none                |
+
+In case you want to reference a term from the Glossary/Index, but don't
+want to display it for whatever reason, the second form can be used.
 
 ### First use logic
 
-Any use of the `short`, `long`, or `both` modifier will not count against the
-term's first use.
+The 'mode' of a glossary term determines which information is printed about this
+term. When using a plain `@term`, possibly with some modifiers, the `auto` mode
+is selected. This mode displays the form depending on the usage counter. On the
+first use (`usage counter == 0`), 'both' forms are printed. On subsequent usage
+(`usage counter > 0`) the 'short' form is printed.
 
-This is useful, for example, when you want to use a term in a heading or a
-caption. In that case, your term might end up in an `outline()` at the top of
+Not all occurrences of a term are counted towards its usage, this depends on
+the mode of the term. Furthermore, this can be manually controlled by modifiers.
+Both are documented in the [reference tables](#reference-for-using-glossary-terms).
+
+This control over the usage counter is practical, for example, when you want to
+use a term in a heading or a caption.
+In that case, your term might end up in an `outline()` at the top of
 your document. Normally you don't want that to count as a term's first real use.
 Normally you want that to happen in the body of your document. So, by using
-these modifiers in such situations, you can not only specify exactly how you
-want your term to appear, but also control whether it counts as a "first use".
+the appropriate mode and modifiers in such situations, you can not only specify
+exactly how you want your term to appear, but also control whether it counts
+as a "first use".
+
+### Reference for Using Glossary Terms
+
+A reference about
+- the different 'modes' and how they determine which information is printed about a term
+- the impact of modes on the [usage counter and ensuing first use behaviour](#first-use-logic)
+- how modifiers can change the behaviour with respect to the usage counter
+- how modifiers impact the presentation of the information printed
+
+A glossary term can display different types of information, which is determined
+by the 'mode' in which it is printed. These modes are all mutually exclusive.
+
+| Mode          | Utilization         | Default first use behaviour | Description |
+| ------------- | ------------------- | --------------------------- | ----------- |
+| `auto`        | `@term`             | use       | The default mode when no 'mode' modifier or supplement is specified. The form depends on the first use counter. |
+| `both`        | `:both`             | use       | Shows both forms of the term, by default ([see `format-term`](#customizing-term-display)) like "Long Form (Short Form)". Falls back to short when long form not available. |
+| `short`       | `:short`            | no-use    | Shows only short form.        |
+| `long`        | `:long`             | no-use    | Shows only long form. Falls back to short when long form not available. |
+| `description` | `:def` <br> `:desc` | no-use    | Shows the description (None of the modifiers apply here & no link is created towards the glossary). |
+| `supplement`  | `[content]`         | no-use    | Shows the content given by [the supplement](#overriding-term-text). |
+| `reset`       | `:reset`            | reset usage counter to 0 | Don't output any content & don't link to the glossary. Typical usage would be after an abstract or even before the start of each chapter, maybe in an injected rule. (This could be made a modifier like `:use` or `:nouse`, but would mostly be utilized as `@term:reset:noindex[]` anyways, thus this is a mode. Write `@term@term:reset` to utilize it as a modifier.) |
+
+Minor modifications to how these different types of information are printed,
+linked or counted towards the usage counter, are controlled by the 'modifiers'.
+They do not influence the default first use behaviour of the mode (unless
+explicitely created for this purpose). Moreover, they neatly compose together
+and with most modes (some exceptions exists, but will print a clear error -
+report a bug if not).
+
+| Modifier                       | Description                                                            |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `:cap`                         | Capitalizes the term                                                   |
+| `:pl`                          | Uses the plural form                                                   |
+| `:noref` <br> `:noindex`       | Don't show the term in the glossary (i.e. no page will be linked - a link from the term towards the glossary is always provided.). |
+| `:a`<br>`a:`<br>`:an`<br>`an:` | Include the article (`an` is just an alias of `a`, they're equivalent) |
+| `:use` <br> `:spend`           | After this occurrence, the term is 'used', i.e. the usage counter is increased by 1. Write `@term:use:noindex[]` to uniquely control the usage counter without output. |
+| `:nouse` <br> `:nospend`       | After this occurrence, the usage counter remains exactly as the same as before. As if the term is transparent with respect to the usage counter. |
 
 ### Generating the Glossary
 
@@ -244,7 +303,7 @@ Or to just show the empty group (i.e. terms without a group):
 
 ### Customizing Term Display
 
-Control how terms appear in the document by providing a custom `show-term` function:
+Control how terms are styled in the document by providing a custom `show-term` function:
 
 ```typst
 #let emph-term(term-body) = { emph(term-body) }
@@ -252,6 +311,26 @@ Control how terms appear in the document by providing a custom `show-term` funct
 #show: init-glossary.with(
   myGlossary,
   show-term: emph-term
+)
+```
+
+Terms can be formatted depending on the 'mode' by providing a custom
+`format-term` function. The mode is one of ("short", "long", "both").
+
+```typst
+// When displaying both, reverse the display order by showing
+// "short (long)" instead of the normal "long (short)"
+#let short-long-term(mode, short-form, long-form) = {
+    if mode == "short" { short-form }
+    else if mode == "long" { long-form }
+    else { // mode assumed to be "both"
+      short-form + " (" + long-form + ")"
+    }
+}
+
+#show: init-glossary.with(
+  myGlossary,
+  format-term: short-long-term
 )
 ```
 
@@ -300,7 +379,7 @@ Customize glossary appearance by defining a theme with three functions:
         columns: (auto, 1fr, auto),
         output,
         repeat([#h(0.25em) . #h(0.25em)]),
-        entry.pages,
+        entry.pages.join(", "),
       )
     )
   }
@@ -313,7 +392,7 @@ Entry fields available to themes:
 - `long`: Long form (can be `none`)
 - `description`: Term description (can be `none`)
 - `label`: Term's dictionary label
-- `pages`: Linked page numbers where term appears
+- `pages`: Array of linked page numbers where term appears
 
 **NOTE:** If the theme does not emit `entry.label`, linking from terms to their
 glossary entry will not work.
@@ -321,3 +400,16 @@ glossary entry will not work.
 ## License
 
 This project is licensed under the MIT License.
+
+## Changelog
+
+### v0.9.0
+- **Breaking**: In themes, entry.pages now returns an array of linked
+  page numbers, instead of opaque content. Use `#entry.pages.join(", ")`
+  in your custom theme to keep the previous behaviour.
+- **Breaking**: The `both` mode (previously called modifier) by default
+  now counts towards the first use of a term.
+- **Breaking**: When multiple conflicting modes are supplied (like 'short'
+  and 'long'), glossy now throws an error (with a clear message).
+- **Breaking**: When an unrecognized modifier is supplied with the term,
+  glossy will now panic instead of ignoring the modifier.

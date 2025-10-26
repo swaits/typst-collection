@@ -135,7 +135,8 @@
   label(__gloss_label_prefix + key + __gloss_entry_postfix)
 }
 
-// Updates the term usage in the glossary state.
+// Updates the term usage (first use counter & wants to be referenced counter)
+// in the glossary state.
 //
 // Parameters:
 //   key (string): The glossary entry key
@@ -143,14 +144,16 @@
 // Returns:
 //   none: Updates state as a side effect
 //
-#let __mark_term_used(key, count-as-first-use) = {
-  counter(__gloss_label_prefix + key).step()
+#let __mark_term_used(key, count-as-referenced, count-as-first-use) = {
+  if count-as-referenced {
+    counter(__gloss_label_prefix + key).step()
+  }
   if count-as-first-use {
     counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).step()
   }
 }
 
-// Queries whether the term is used ANYWHERE
+// Queries whether the term wants to be referenced from ANYWHERE
 //
 // Parameters:
 //   key (string): The glossary entry key
@@ -159,7 +162,7 @@
 // Returns:
 //   boolean: If the entry is used above the location in the document
 //
-#let __is_term_ever_used(key, location: none) = {
+#let __is_term_ever_referenced(key, location: none) = {
   let c = counter(__gloss_label_prefix + key)
   c = if location == none {c.final()} else {c.at(location)}
   c.at(0) > 0
@@ -181,6 +184,18 @@
   let c = counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix)
   c = if location == none {c.final()} else {c.at(location)}
   c.at(0) > 0
+}
+
+// Reset the first use counter to 0
+//
+// Parameters:
+//   key (string): The glossary entry key
+//
+// Returns:
+//   none: Updates state as a side effect
+//
+#let __reset_term_first_used(key, location: none) = {
+  counter(__gloss_label_prefix + key + __gloss_first_use_counter_postfix).update(0)
 }
 
 // Determine if the glossary contains a visible entry
@@ -207,8 +222,6 @@
 //     - "long": Show only the long form.
 //     - "def" or "desc": Show the term's description instead of its name.
 //     - "a" or "an": Prepend an article, chosen from the entry (short or long form).
-//     - "hide" or "hidden": Use term (for the sake of the glossary/index),
-//     but don't display it.
 //   show-term (function): A function that renders the chosen term.
 //   term-links (boolean): If terms should be clickable links leading to glossary
 //
@@ -223,18 +236,68 @@
 //   content: The fully formatted term, including optional article, capitalization,
 //            usage tracking metadata, and the chosen form (short, long, or both).
 //
-#let __gls(key, modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
+#let __gls(key, modes-modifiers: array, format-term: function, show-term: function, term-links: true, display-text: none) = {
+  let possible_modes = ("auto", "both", "short", "long", "supplement", "description", "reset")
   // ---------------------------------------------------------------------------
-  // Check for illegal modifier combinations
+  // Normalize mode & modifier inputs AND check if the modifiers are valid
   // ---------------------------------------------------------------------------
-  if ("def" in modifiers or "desc" in modifiers) and modifiers.len() > 1 {
-    panic("Cannot use 'def'/'desc' with other modifiers.")
+  let modes-modifiers = modes-modifiers.map(it => {
+    if it == "def" or it == "desc" {
+      return "description"
+    } else if it == "a" or it == "an" {
+      return "an"
+    } else if it == "use" or it == "spend" {
+      return "use"
+    } else if it == "nouse" or it == "nospend" {
+      return "no-use"
+    } else if it == "noref" or it == "noindex" {
+      return "noindex"
+    } else if it in ("both", "short", "long", "reset", "cap", "pl") {
+      return it
+    } else if it in ("auto", "description", "supplement") {
+      panic(it, "is a valid mode, but is not used by applying a modifier with this name. Read the documentation.")
+    } else {
+      panic(it, "is not a recognized mode or modifier.")
+    }
+  })
+  if display-text != none and display-text != auto {
+    // A supplement is provided, thus the mode is "supplement"
+    modes-modifiers.push("supplement")
   }
-  if ("a" in modifiers or "an" in modifiers) and ("pl" in modifiers) {
+
+  // ---------------------------------------------------------------------------
+  // Determine the requested modes (plural) and the modifier array
+  // ---------------------------------------------------------------------------
+  modes-modifiers.push("__MIDDLE_ITEM") // unused modifier
+  let (requested_modes, modifiers) = modes-modifiers.sorted(key: it => {
+    if it in possible_modes {
+      // It is a 'mode'
+      return -1
+    } else if it == "__MIDDLE_ITEM" {
+      return 0
+    } else {
+      // It is a 'modifier'
+      return 1
+    }
+  }).split("__MIDDLE_ITEM")
+
+  // ---------------------------------------------------------------------------
+  // Check for illegal mode and/or modifier combinations
+  // ---------------------------------------------------------------------------
+  if requested_modes.len() > 1 {
+    panic("Cannot mix modes ", requested_modes, ", pick one.")
+  }
+  if "description" in requested_modes and modifiers.len() > 0 {
+    panic("Cannot use mode 'def'/'desc' with other modifiers.")
+  }
+  if "reset" in requested_modes and modifiers.len() > 0 {
+    panic("Cannot use mode 'reset' with other modifiers.")
+  }
+  if "an" in modifiers and "pl" in modifiers {
     panic("Cannot use 'a'/'an' and 'pl' together.")
   }
-  if ("hidden" in modifiers or "hide" in modifiers) and modifiers.len() > 1{
-    panic("Cannot use 'hide'/'hidden' with other modifiers.")
+  if "use" in modifiers and "no-use" in modifiers {
+    panic("Cannot use 'use'/'spend' and 'nouse'/'nospend' together.")
   }
 
   // ---------------------------------------------------------------------------
@@ -243,24 +306,41 @@
   let entry = __get_entry(key)
 
   // ---------------------------------------------------------------------------
-  // If "def" or "desc" modifier is present, show the entry's description immediately
+  // Determine the requested mode (singular)
   // ---------------------------------------------------------------------------
-  if "def" in modifiers or "desc" in modifiers {
+  let requested_mode = if requested_modes.len() == 0 {
+    "auto"
+  } else {
+    requested_modes.at(0)
+  }
+
+  // ---------------------------------------------------------------------------
+  // If mode is "description", show the entry's description immediately
+  // ---------------------------------------------------------------------------
+  if requested_mode == "description" {
     if entry.description == none {
       panic("Use of 'def'/'desc' requires a description be defined.")
     }
     return show-term([#entry.description])
+  }
+  // ---------------------------------------------------------------------------
+  // If mode is "reset", reset the (first) usage counter and return immediately
+  // ---------------------------------------------------------------------------
+  if requested_mode == "reset" {
+    __reset_term_first_used(key)
+    return
   }
 
   // ---------------------------------------------------------------------------
   // Manage term usage counting and determine if it's the first reference
   // ---------------------------------------------------------------------------
   let is_first_use = not __is_term_first_used(key, location: here())
-  let count-as-first-use = ("short" not in modifiers and "long" not in modifiers and "both" not in modifiers)
-  let wants_reference = ("noref" not in modifiers and "noindex" not in modifiers)
-  if wants_reference {
-    __mark_term_used(key, count-as-first-use)
-  }
+  let default-count-as-first-use = (requested_mode == "auto" or requested_mode == "both")
+  let force-count-as-first-use = "use" in modifiers
+  let force-skip-as-first-use = "no-use" in modifiers
+  let wants_reference = "noindex" not in modifiers
+  __mark_term_used(key, wants_reference, force-count-as-first-use
+                                         or (not force-skip-as-first-use and default-count-as-first-use))
 
   // ---------------------------------------------------------------------------
   // Helper Functions
@@ -282,7 +362,7 @@
   let capitalize_term = (article, term) => {
     if "cap" not in modifiers {
       (article, term)
-    } else if article == "" {
+    } else if article == none {
       // No article present, so capitalize the term's first letter.
       (article, upper(term.first()) + term.slice(1))
     } else {
@@ -292,14 +372,14 @@
   }
 
   // get_article(mode): Returns the appropriate article string based on the mode.
-  //   - If wants_article is false, returns an empty string.
+  //   - If wants_article is false, returns none
   //   - If mode is "short", return the short article.
   //   - If mode is "long" or "both", return the long article.
   // The calling logic ensures that when mode = "long" or "both", a long form exists.
   let get_article = (mode) => {
-    let wants_article = "a" in modifiers or "an" in modifiers
+    let wants_article = "an" in modifiers
     if not wants_article {
-      ""
+      none
     } else if mode == "short" {
       entry.article + " "
     } else {
@@ -308,67 +388,38 @@
     }
   }
 
-  // determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available):
-  // Decides which mode ("short", "long", or "both") to use.
-  // Preference is given to explicit modifiers. If the requested mode can't be fulfilled due to no long form,
-  // fall back to "short".
-  // If no explicit mode is given, the default behavior is:
-  //   - On first use and if a long form exists, "both".
-  //   - Otherwise, "short".
-  let determine_mode = (wants_both, wants_long, wants_short, is_first_use, long_available, wants_hidden) => {
-    if wants_hidden {
-      // If it's hidden, nothing else matters
-      "hidden"
-    } else if wants_both {
-      // Explicit request for "both":
-      // If a long form exists, use "both", otherwise fall back to "short".
-      if long_available {
-        "both"
-      } else {
-        "short"
-      }
-    } else if wants_long {
-      // Explicit request for "long":
-      // If a long form exists, use "long", otherwise fall back to "short".
-      if long_available {
-        "long"
-      } else {
-        "short"
-      }
-    } else if wants_short {
-      // Explicit request for "short":
-      // Always "short" regardless of availability.
-      "short"
-    } else {
-      // No explicit mode given:
-      // On first use with a long form available, default to "both".
-      // Otherwise, use "short".
-      if is_first_use and long_available {
-        "both"
-      } else {
-        "short"
-      }
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // Determine desired options based on modifiers and entry.long availability
   // ---------------------------------------------------------------------------
-  let wants_both = "both" in modifiers
-  let wants_long = "long" in modifiers
-  let wants_short = "short" in modifiers
-  let wants_hidden = ("hidden" in modifiers or "hide" in modifiers)
-  let long_available = entry.long != none
+  // Decide which mode ("short", "long", or "both" or "supplement") to use.
+  // If the requested mode can't be fulfilled due to no long form, fall back to "short".
+  // If no explicit mode is given (i.e. we are in 'auto' mode), the default behavior is:
+  //   - On first use and if a long form exists, "both".
+  //   - Otherwise, "short".
+  if requested_mode == "auto" {
+    // Set requested_mode to automatically determined mode
+    requested_mode = if is_first_use {
+      "both"
+    } else {
+      "short"
+    }
+  }
 
-  // Determine mode using the helper function
-  let mode = determine_mode(wants_both, wants_long, wants_short, is_first_use, long_available, wants_hidden)
+  let long_available = entry.long != none
+  let mode = if (requested_mode == "both" or requested_mode == "long") and not long_available {
+    // The fall back case, because long form is not available, but it is requested
+    "short"
+  } else {
+    // No fall back needed, the requested mode can be fulfilled
+    requested_mode
+  }
 
   // Pluralize (if requested)
   let short-form = pluralize_term(entry.short, entry.plural)
   let long-form = pluralize_term(entry.long, entry.longplural) // `none` safe here
 
   // Apply format-term() to get the term
-  let formatted-term = if display-text != none and display-text != auto {
+  let formatted-term = if mode == "supplement" {
     // Display text was overriden by user, just accept it (string or content)
     display-text
   } else {
@@ -380,7 +431,7 @@
     // that with content, thus requiring a string here.
     // TODO: consider if we want to capitalize *before* this. First intuition is
     // "no".
-    panic("Your cutsom format-term() function must return a string.")
+    panic("Your custom format-term() function must return a string.")
   }
 
   // Get the article, then capitalize either the article or term (if requested)
@@ -390,7 +441,7 @@
   // Construct and return the final output
   // ---------------------------------------------------------------------------
   context {
-    let linked-term = if term-links and query(__entry_label(key)).len() > 0 {
+    let linked-term = if term-links and __has_glossary_entry(key) {
       link(__entry_label(key), term)
     } else {
       term
@@ -403,40 +454,33 @@
     }
 
     // Create the output content
-    if mode == "hidden" {
-      // just put the metadata+label out there
-      [#metadata("hidden term")#term-label]
-    } else {
-      // normal term display (ie not hidden)
-      [#article#show-term(linked-term)#metadata(term)#term-label]
-      // |^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^^^
-      // \_art.|                      |              |
-      //       \_ apply user formatting function to the term
-      //                              |              |
-      //                              \_ metadata lets us label (ie makes it "labelable")
-      //                                             |
-      //                                             \_ i.e. <__gloss:key>, etc.
-      //                                                for backlink from glossary
-    }
+    [#article#show-term(linked-term)#metadata(term)#term-label]
+    // |^^^^^|^^^^^^^^^             |^^^^^^^^      |^^^^^^^^^^
+    // |     |                      |              \_ the label for backlink from
+    // |     |                      |                 glossary i.e. <__gloss:key>, etc.
+    // |     |                      \_ metadata lets us label (ie makes it "labelable")
+    // |     \_ apply user formatting function to the term
+    // \_art.
   }
 }
 
 // Creates page number links back to each usage of a glossary term.
 //
-// This function generates a comma-separated list of page numbers, where each
-// number links back to a usage of the term in the document. Duplicate page
-// numbers are removed to avoid redundancy.
+// This function generates an array of page numbers, where each number links
+// back to a usage of the term in the document. Duplicate page numers are
+// removed to avoid redundancy.
 //
 // Parameters:
 //   key (string): The glossary entry key
 //
 // Returns:
-//   content: Comma-separated list of linked page numbers
+//   array: Linked page numbers
 //
-// Example output: "1, 3, 5" where each number links to the term usage on that page
+// Example output after a typical .join(", "):
+// "1, 3, 5" where each number links to the term usage on that page
 //
 #let __create_backlinks(key) = {
-  return context query(__term_label(key)) // find all reference
+  return query(__term_label(key)) // find all reference
     .map(meta => { // extract location and page number (or symbol)
       let loc = meta.location()
       let page = numbering(__default(loc.page-numbering(), "1"), ..counter(page).at(loc))
@@ -444,7 +488,6 @@
     })
     .dedup(key: ((loc, page)) => page) // deduplicate by page
     .map(((loc, page)) => link(loc, page)) // create links
-    .join(", ")
 }
 
 // Formats a term string based on the specified mode.
@@ -559,7 +602,7 @@
     // Now see if this is an actual glossary term key
     if __has_entry(key) {
       // Found in dictionary, render via __gls()
-      __gls(key, modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, display-text: supplement)
+      __gls(key, modes-modifiers: modifiers.map(lower), format-term: format-term, show-term: show-term, term-links: term-links, display-text: supplement)
     } else {
       // Not one of ours, so just pass it through
       r
@@ -592,7 +635,7 @@
 //         - long: Long form of term (optional)
 //         - description: Term description (optional)
 //         - label: Term's dictionary label
-//         - pages: Linked page numbers where term appears
+//         - pages: Array of linked page numbers where term appears
 //       - index: Zero-based entry index within group
 //       - total: Total entries in group
 //   groups (array): Optional list of groups to include
@@ -622,7 +665,7 @@
   let output = (:)
   let all_entries = __gloss_entries.final()
   let all_used = if not show-all {
-    all_entries.keys().filter(key => __is_term_ever_used(key))
+    all_entries.keys().filter(key => __is_term_ever_referenced(key))
   } else {
     all_entries.keys()
   }

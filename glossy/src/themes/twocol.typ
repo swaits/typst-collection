@@ -36,7 +36,7 @@
   //     - long: Long form of term (optional)
   //     - description: Term description (optional)
   //     - label: Term's dictionary label
-  //     - pages: Linked page numbers where term appears
+  //     - pages: Array of linked page numbers where term appears
   //   index: Zero-based entry index within group
   //   total: Total entries in group
   entry: (entry, index, total) => {
@@ -65,7 +65,7 @@
         [#short-display#entry.label#long-display#description],  // Term with label
         [#repeat(h(0.25em) + "." + h(0.25em))],  // Dotted leader line
         [ . ], // A 1em wide dot so we definitely get some break between term and pages
-        [#entry.pages]                 // Page references
+        [#entry.pages.join(", ")]                 // Page references
       )
     )
   },

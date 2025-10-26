@@ -37,7 +37,7 @@
 
 === `@ShortInHeader:short` = "@ShortInHeader:short"
 === `@LongInHeader:long` = "@LongInHeader:long"
-=== `@BothInHeader:both` = "@BothInHeader:both"
+=== `@BothInHeader:both:nouse` = "@BothInHeader:both:nouse"
 === `@NormalInHeader` = "@NormalInHeader"
 
 #line(length: 100%)
@@ -47,7 +47,7 @@
 
 #figure([], caption: [`@ShortInCaption:short` = "@ShortInCaption:short"])
 #figure([], caption: [`@LongInCaption:long` = "@LongInCaption:long"])
-#figure([], caption: [`@BothInCaption:both` = "@BothInCaption:both"])
+#figure([], caption: [`@BothInCaption:both:nospend` = "@BothInCaption:both:nospend"])
 #figure([], caption: [`@NormalInCaption` = "@NormalInCaption"])
 
 #line(length: 100%)
