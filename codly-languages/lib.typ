@@ -18,7 +18,7 @@
       baseline: 0.05em,
       inset: 0pt,
       outset: 0pt,
-    ) + h(0.3em)
+    )
   }
 
   let __emoji(emoji) = {
@@ -26,7 +26,7 @@
       emoji,
       inset: 0pt,
       outset: 0pt,
-    ) + h(0.3em)
+    )
   }
 
   // configurations for languages
@@ -643,9 +643,9 @@
     tsx:                  (name: "TSX",               color: rgb("#007acc"), icon: __icon("typescript.svg")), //Devicons
     typescriptreact:      (name: "React",             color: rgb("#61dafb"), icon: __icon("react.svg")), //Devicons
     //Typst
-    typst:                (name: "Typst",             color: rgb("#8b70c3"), icon: __icon("typst.svg")), //Typst
+    typst:                (name: "Typst",             color: rgb("#458fa0"), icon: __icon("typst.svg")), //Typst
     typ:                  (name: "Typst",             color: rgb("#458fa0"), icon: __icon("typst.svg")), //Typst
-    typc:                 (name: "Typst",             color: rgb("#8b70c3"), icon: __icon("typst.svg")), //Typst
+    typc:                 (name: "Typst",             color: rgb("#458fa0"), icon: __icon("typst.svg")), //Typst
     typm:                 (name: "Typst",             color: rgb("#458fa0"), icon: __icon("typst.svg")), //Typst
     //UML
     uml:                  (name: "UML",               color: rgb("#452e7f"), icon: __icon("unifiedmodelinglanguage.svg")), //Devicons
