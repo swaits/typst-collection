@@ -14,8 +14,7 @@
   // helper function which takes an image filename and creates an icon
   let __icon(image-filename) = {
     box(
-      image("icons/" + image-filename, height: 0.9em),
-      baseline: 0.05em,
+      image("icons/" + image-filename, height: 130%, fit: "contain"),
       inset: 0pt,
       outset: 0pt,
     )
