@@ -4,7 +4,7 @@
 RSYNC_OPTS="--archive --delete --itemize-changes --human-readable"
 
 # Set the destination base directory
-DEST_DIR="$HOME/Code/forks/typst-packages-fork/packages/preview"
+DEST_DIR="$HOME/Code/typst-packages-fork/packages/preview"
 
 # Ensure the destination base directory exists
 mkdir -p "$DEST_DIR"
