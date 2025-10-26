@@ -1,5 +1,5 @@
 #import "/lib.typ": *
-#import "@preview/codly:1.2.0": *
+#import "@preview/codly:1.3.0": *
 #show: codly-init
 #codly(languages: codly-languages)
 
