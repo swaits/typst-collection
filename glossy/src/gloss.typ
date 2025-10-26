@@ -10,6 +10,34 @@
 #let __gloss_first_use_counter_postfix = ":first-use-count"
 #let __gloss_entry_postfix = ":entry"
 
+#let __normalize_reference(reference) = {
+  
+  if reference == none {
+    return none
+  }
+
+  if type(reference) != dictionary {
+    panic("Reference has to be a dictionary")
+  }
+
+  if not "key" in reference {
+    panic("Reference must contain a key named 'key'")
+  }
+
+  if type(reference.key) != str {
+    panic("Reference 'key' must be a string")
+  }
+
+  if reference.key.trim() == "" {
+    panic("Reference 'key' cannot be empty")
+  }
+
+  (
+    key: reference.key,
+    supplement: reference.at("supplement", default: none)
+  )
+}
+
 // Normalizes a dictionary entry by ensuring all required and optional keys exist
 // with appropriate default values.
 //
@@ -59,7 +87,8 @@
     longplural: entry.at("longplural", default: __pluralize(long)),
     longarticle: entry.at("longarticle", default: __determine_article(long)),
     description: entry.at("description", default: none),
-    group: entry.at("group", default: "")
+    group: entry.at("group", default: ""),
+    reference: __normalize_reference(entry.at("reference", default: none))
   )
 }
 
@@ -671,6 +700,7 @@
           short: entry.at("short"),
           long: entry.at("long"),
           description: entry.at("description"),
+          reference: entry.at("reference"),
           label: [#metadata(key)#__entry_label(key)],
           pages: __create_backlinks(key)
         ))

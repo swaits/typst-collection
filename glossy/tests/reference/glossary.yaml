@@ -1,0 +1,14 @@
+refac:
+  short: RefAc
+  long: Referenced Acronym
+  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  reference: 
+    key: "doe2025"
+
+refacwsup:
+  short: RefAcWSup
+  long: Referenced Acronym
+  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  reference: 
+    key: "doe2025"
+    supplement: "p. 69"

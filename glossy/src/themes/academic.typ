@@ -31,6 +31,17 @@
       [. #entry.description]
     }
 
+    // Format the reference
+    let reference = if entry.reference == none {
+      []
+    } else {
+      if entry.reference.supplement == none {
+        [ #cite(label(entry.reference.key))]
+      } else {
+        [ #cite(label(entry.reference.key), supplement: entry.reference.supplement)]
+      }
+    }
+
     block(
       below: 1em,
       text(
@@ -39,7 +50,7 @@
           grid(
             columns: (1fr, auto),
             gutter: 0.75em,
-            [#short-display#long-display#description#entry.label],
+            [#short-display#long-display#description#reference#entry.label],
             text(fill: rgb("#666666"), entry.pages)
           )
         }

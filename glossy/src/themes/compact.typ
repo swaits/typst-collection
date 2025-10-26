@@ -68,6 +68,18 @@
       text(size: 0.65em, [· #entry.description])
     }
 
+
+    // Format the reference
+    let reference = if entry.reference == none {
+      []
+    } else {
+      if entry.reference.supplement == none {
+        text(size: 0.65em, [ #cite(label(entry.reference.key))])
+      } else {
+        text(size: 0.65em, [ #cite(label(entry.reference.key), supplement: entry.reference.supplement)])
+      }
+    }
+
     // Create the complete entry with tight spacing
     block(
       spacing: 0.4em,
@@ -76,7 +88,7 @@
         align: left+bottom,
         gutter: 0.5em,
         // Term and description column
-        box[#term#entry.label#long-form #description],
+        box[#term#entry.label#long-form #description#reference],
         // Dots....
         repeat(h(0.25em) + text(fill: gray, ".") + h(0.25em)),
         // Page references with smaller font

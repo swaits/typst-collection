@@ -10,8 +10,15 @@
       longplural: z.content(optional: true),
       description: z.content(optional: true),
       group: z.content(optional: true),
-    )
-  )
+      reference: z.dictionary(
+        optional: true,
+        (
+          key: z.content(),
+          supplement: z.content(optional: true),
+        ),
+      ),
+    ),
+  ),
 )
 
 #let theme-schema = z.dictionary(
@@ -19,7 +26,7 @@
     section: z.function(),
     group: z.function(),
     entry: z.function(),
-  )
+  ),
 )
 
 #let groups-list-schema = z.array(pre-transform: z.coerce.array)

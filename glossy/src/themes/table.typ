@@ -4,13 +4,13 @@
     heading(level: 1, title)
     body
   },
-
   group: (name, index, total, body) => {
     if name != "" and total > 1 {
       heading(level: 2, name)
     }
 
-    table(columns: 4,
+    table(
+      columns: 4,
       stroke: none,
       inset: (x, y) => {
         if (x == 0) {
@@ -22,11 +22,18 @@
         }
       },
       table.header([*Abbreviation*], [*Full Name*], [*Description*], [*Pages*]),
-      ..body
+      ..body,
     )
   },
-
   entry: (entry, index, total) => {
-    (entry.short + entry.label, entry.long, entry.description, entry.pages)
-  }
+    if entry.reference == none {
+      (entry.short + entry.label, entry.long, entry.description, entry.pages)
+    } else {
+      if entry.reference.supplement == none {
+        (entry.short + entry.label, entry.long, [#entry.description #cite(label(entry.reference.key))], entry.pages)
+      } else {
+        (entry.short + entry.label, entry.long, [#entry.description #cite(label(entry.reference.key), supplement: entry.reference.supplement)], entry.pages)
+      }
+    }
+  },
 )
