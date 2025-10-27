@@ -12,6 +12,7 @@
   body-size: BODY_SIZE,
   icon-contact-header: none,
   keywords: "",
+  show_last_updated: true,
   thumbnail: none, // check out https://qrframe.kylezhe.ng/ for QR code generation
   body
 ) = {
@@ -47,7 +48,7 @@
           columns: (1fr, 1fr, 1fr),
           align: (left, center, right + horizon),
           // left column
-          [Last updated: #date],
+          if show_last_updated [Last updated: #date],
           // center column
           if multi_page { counter(page).display(both: true, "1 of 1") },
           // right column
