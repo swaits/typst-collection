@@ -5,7 +5,6 @@
     v(1em)
     body
   },
-
   group: (name, index, total, body) => {
     if name != "" and total > 1 {
       v(1.5em)
@@ -16,7 +15,6 @@
     }
     body
   },
-
   entry: (entry, index, total) => {
     let short-display = text(weight: "bold", entry.short)
     let long-display = if entry.long == none {
@@ -40,10 +38,10 @@
             columns: (1fr, auto),
             gutter: 0.75em,
             [#short-display#long-display#description#entry.label],
-            text(fill: rgb("#666666"), entry.pages)
+            text(fill: rgb("#666666"), entry.pages.join(", ")),
           )
-        }
-      )
+        },
+      ),
     )
   },
 )

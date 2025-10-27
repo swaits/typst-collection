@@ -2,7 +2,7 @@
 
 #show: init-glossary.with((
   one: "this is term one",
-  two: "term two also"
+  two: "term two also",
 ))
 
 #set page(
@@ -19,15 +19,15 @@ shown anyway.
 
 #glossary(
   theme: theme-chicago-index,
-  show-all: true
+  show-all: true,
 )
 
 #glossary(
   theme: theme-compact,
-  show-all: true
+  show-all: true,
 )
 
 #glossary(
   theme: theme-table,
-  show-all: true
+  show-all: true,
 )

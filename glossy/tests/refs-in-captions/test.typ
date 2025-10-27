@@ -2,14 +2,14 @@
 
 // Our test glossary
 #show: init-glossary.with((
-    ShortInHeader: "short used in header",
-    ShortInCaption: "short used in caption",
-    LongInHeader: "long used in header",
-    LongInCaption: "long used in caption",
-    BothInHeader: "both used in header",
-    BothInCaption: "both used in caption",
-    NormalInHeader: "unmodified use in header",
-    NormalInCaption: "unmodified use in caption",
+  ShortInHeader: "short used in header",
+  ShortInCaption: "short used in caption",
+  LongInHeader: "long used in header",
+  LongInCaption: "long used in caption",
+  BothInHeader: "both used in header",
+  BothInCaption: "both used in caption",
+  NormalInHeader: "unmodified use in header",
+  NormalInCaption: "unmodified use in caption",
 ))
 
 // Configure styling
@@ -21,11 +21,11 @@
 
 // Outlines
 
-#outline(title:"Table of Contents", indent: auto)
+#outline(title: "Table of Contents", indent: auto)
 #outline(title: "List of Figures", target: figure.where(kind: image))
 #block(
-  height:7em,
-  glossary(title: "List of Abbreviations", theme: theme-twocol)
+  height: 7em,
+  glossary(title: "List of Abbreviations", theme: theme-twocol),
 )
 
 #line(length: 100%)
@@ -37,7 +37,7 @@
 
 === `@ShortInHeader:short` = "@ShortInHeader:short"
 === `@LongInHeader:long` = "@LongInHeader:long"
-=== `@BothInHeader:both` = "@BothInHeader:both"
+=== `@BothInHeader:both:nouse` = "@BothInHeader:both:nouse"
 === `@NormalInHeader` = "@NormalInHeader"
 
 #line(length: 100%)
@@ -47,7 +47,10 @@
 
 #figure([], caption: [`@ShortInCaption:short` = "@ShortInCaption:short"])
 #figure([], caption: [`@LongInCaption:long` = "@LongInCaption:long"])
-#figure([], caption: [`@BothInCaption:both` = "@BothInCaption:both"])
+#figure(
+  [],
+  caption: [`@BothInCaption:both:nospend` = "@BothInCaption:both:nospend"],
+)
 #figure([], caption: [`@NormalInCaption` = "@NormalInCaption"])
 
 #line(length: 100%)

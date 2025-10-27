@@ -22,11 +22,11 @@
   tps: (
     short: "TPS",
     long: "test procedure specification",
-    description: "A document on how to run all the test procedures"
+    description: "A document on how to run all the test procedures",
   ),
 )
 
-#show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
+#show: init-glossary.with(myGlossary, show-term: body => [#emph(body)])
 
 #set page(numbering: "1")
 

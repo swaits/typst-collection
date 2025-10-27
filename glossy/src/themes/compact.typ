@@ -17,7 +17,6 @@
     heading(level: 1, outlined: false, text(weight: "bold", size: 1.1em, title))
     body
   },
-
   // Renders a group of related glossary terms
   // Parameters:
   //   name: Group name (empty string for ungrouped terms)
@@ -30,13 +29,12 @@
         spacing: 0.5em,
         pad(
           top: 0.5em,
-          text(weight: "bold", size: 0.9em, name)
-        )
+          text(weight: "bold", size: 0.9em, name),
+        ),
       )
     }
     body
   },
-
   // Renders a single glossary entry with term, definition, and page references
   // Parameters:
   //   entry: Dictionary containing term data:
@@ -44,7 +42,7 @@
   //     - long: Long form of term (optional)
   //     - description: Term description (optional)
   //     - label: Term's dictionary label
-  //     - pages: Linked page numbers where term appears
+  //     - pages: Array of linked page numbers where term appears
   //   index: Zero-based entry index within group
   //   total: Total entries in group
   entry: (entry, index, total) => {
@@ -53,7 +51,7 @@
       size: 0.65em,
       weight: "medium",
       fill: gray.darken(60%),
-      entry.short
+      entry.short,
     )
 
     let long-form = if entry.long == none {
@@ -73,7 +71,7 @@
       spacing: 0.4em,
       grid(
         columns: (auto, 1fr, auto),
-        align: left+bottom,
+        align: left + bottom,
         gutter: 0.5em,
         // Term and description column
         box[#term#entry.label#long-form #description],
@@ -83,9 +81,9 @@
         text(
           size: 0.6em,
           fill: gray.darken(20%),
-          entry.pages
-        )
-      )
+          entry.pages.join(", "),
+        ),
+      ),
     )
   },
 )

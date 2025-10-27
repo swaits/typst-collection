@@ -1,5 +1,5 @@
 #import "/lib.typ": *
-#import "@preview/glossarium:0.5.3": *
+#import "@preview/glossarium:0.5.9": *
 
 #set page(height: auto, width: 4.5in)
 #show link: set text(fill: red)
@@ -19,7 +19,7 @@
     This should be a link, too: @WWW
 
     #glossary()
-  ]
+  ],
 )
 
 // -----------------------------------------------------------------------------
@@ -41,5 +41,5 @@
     This should be a link, too: @ML
 
     #print-glossary(entry-list)
-  ]
+  ],
 )

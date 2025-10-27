@@ -15,7 +15,6 @@
     heading(level: 1, title)
     body
   },
-
   // Renders a group of related glossary terms
   // Parameters:
   //   name: Group name (empty string for ungrouped terms)
@@ -28,7 +27,6 @@
     }
     body
   },
-
   // Renders a single glossary entry with term, definition, and page references
   // Parameters:
   //   entry: Dictionary containing term data:
@@ -36,7 +34,7 @@
   //     - long: Long form of term (optional)
   //     - description: Term description (optional)
   //     - label: Term's dictionary label
-  //     - pages: Linked page numbers where term appears
+  //     - pages: Array of linked page numbers where term appears
   //   index: Zero-based entry index within group
   //   total: Total entries in group
   entry: (entry, index, total) => {
@@ -62,9 +60,9 @@
         left: 1em,
         bottom: 0.5em,
         block(
-          [#term#entry.label#long-form#description #h(1em) (pp. #entry.pages)]
-        )
-      )
+          [#term#entry.label#long-form#description #h(1em) (pp. #entry.pages.join(", "))],
+        ),
+      ),
     )
   },
 )

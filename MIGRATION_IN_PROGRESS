@@ -1,0 +1,9 @@
+Migration started: 2025-10-26 21:22
+
+This repository is being split into individual package repositories.
+During this transition:
+- No new issues or PRs should be created
+- Existing issues are being triaged and moved
+- The repository will be archived once migration is complete
+
+New organization: https://github.com/swaits-typst-packages

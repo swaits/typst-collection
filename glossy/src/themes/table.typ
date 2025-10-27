@@ -4,13 +4,13 @@
     heading(level: 1, title)
     body
   },
-
   group: (name, index, total, body) => {
     if name != "" and total > 1 {
       heading(level: 2, name)
     }
 
-    table(columns: 4,
+    table(
+      columns: 4,
       stroke: none,
       inset: (x, y) => {
         if (x == 0) {
@@ -22,11 +22,15 @@
         }
       },
       table.header([*Abbreviation*], [*Full Name*], [*Description*], [*Pages*]),
-      ..body
+      ..body,
     )
   },
-
   entry: (entry, index, total) => {
-    (entry.short + entry.label, entry.long, entry.description, entry.pages)
-  }
+    (
+      entry.short + entry.label,
+      entry.long,
+      entry.description,
+      entry.pages.join(", "),
+    )
+  },
 )

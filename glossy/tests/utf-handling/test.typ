@@ -1,4 +1,4 @@
-#import "/lib.typ":*
+#import "/lib.typ": *
 
 #set text(lang: "cs", region: "CZ")
 

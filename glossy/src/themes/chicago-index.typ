@@ -5,7 +5,6 @@
     heading(level: 1, smallcaps(title))
     body
   },
-
   group: (name, index, total, body) => {
     if name != "" and total > 1 {
       v(1em)
@@ -14,13 +13,12 @@
     }
     body
   },
-
   entry: (entry, index, total) => {
     let short-display = text(weight: "regular", entry.short)
     let long-display = if entry.long == none {
       []
     } else {
-      [ — #entry.long]  // Using em-dash for Chicago style
+      [ — #entry.long] // Using em-dash for Chicago style
     }
 
     let description = if entry.description == none {
@@ -38,10 +36,10 @@
             columns: (1fr, auto),
             gutter: 1em,
             [#short-display#entry.label#long-display#description#entry.label],
-            [#entry.pages]
+            [#entry.pages.join(", ")],
           )
-        }
-      )
+        },
+      ),
     )
   },
 )

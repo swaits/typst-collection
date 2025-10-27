@@ -1,3 +1,54 @@
+# 🚨 REPOSITORY MOVING - DO NOT CREATE NEW ISSUES OR PRS HERE 🚨
+
+<div align="center">
+
+## ⛔ THIS REPOSITORY IS BEING MIGRATED ⛔
+
+### **ALL PACKAGES ARE MOVING TO:** [github.com/swaits-typst-packages](https://github.com/swaits-typst-packages)
+
+**DO NOT:**
+- ❌ Create new issues here
+- ❌ Submit new pull requests here  
+- ❌ Start new work based on this repo
+
+**INSTEAD:**
+- ✅ Go to the new organization: [swaits-typst-packages](https://github.com/swaits-typst-packages)
+- ✅ Find your specific package repository there
+- ✅ Create issues/PRs in the individual package repos
+
+</div>
+
+---
+
+## 📦 New Repository Locations
+
+| If you're looking for... | Go to... |
+|--------------------------|----------|
+| **codly-languages** | ➡️ [github.com/swaits-typst-packages/codly-languages](https://github.com/swaits-typst-packages/codly-languages) |
+| **easy-typography** | ➡️ [github.com/swaits-typst-packages/easy-typography](https://github.com/swaits-typst-packages/easy-typography) |
+| **finely-crafted-cv** | ➡️ [github.com/swaits-typst-packages/finely-crafted-cv](https://github.com/swaits-typst-packages/finely-crafted-cv) |
+| **glossy** | ➡️ [github.com/swaits-typst-packages/glossy](https://github.com/swaits-typst-packages/glossy) |
+| **pro-letter** | ➡️ [github.com/swaits-typst-packages/pro-letter](https://github.com/swaits-typst-packages/pro-letter) |
+| **rfc-vibe** | ➡️ [github.com/swaits-typst-packages/rfc-vibe](https://github.com/swaits-typst-packages/rfc-vibe) |
+| **run-liners** | ➡️ [github.com/swaits-typst-packages/run-liners](https://github.com/swaits-typst-packages/run-liners) |
+| **swank-tex** | ➡️ [github.com/swaits-typst-packages/swank-tex](https://github.com/swaits-typst-packages/swank-tex) |
+| **tasteful-pairings** | ➡️ [github.com/swaits-typst-packages/tasteful-pairings](https://github.com/swaits-typst-packages/tasteful-pairings) |
+
+## ⏳ Migration In Progress
+
+We are currently:
+1. Moving existing issues to the appropriate new repositories
+2. Redirecting pull requests to the new locations
+3. Setting up the new package infrastructure
+
+**Expected completion: [Coming Soon]**
+
+---
+
+
+<details>
+<summary>📜 Original README (click to expand)</summary>
+
 # `typst-collection`
 
 A collection of `typst` templates and packages by [swaits](https://swaits.com/about).
@@ -35,3 +86,5 @@ links below to their main page.
 ## License
 
 All content licensed under the [MIT license](LICENSE).
+
+</details>

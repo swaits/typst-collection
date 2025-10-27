@@ -7,20 +7,23 @@
     short: "HTML",
     long: "Hypertext Markup Language",
     description: "A standard language for creating web pages",
-    group: "Web"),
+    group: "Web",
+  ),
   css: (
     short: "CSS",
     long: "Cascading Style Sheets",
     description: "A language used for describing the presentation of a document",
-    group: "Web"),
+    group: "Web",
+  ),
   tps: (
     short: "TPS",
     long: "test procedure specification",
-    description: "A document on how to run all the test procedures"),
-   unused: "Unused term, which shouldn't print in the glossary."
+    description: "A document on how to run all the test procedures",
+  ),
+  unused: "Unused term, which shouldn't print in the glossary.",
 )
 
-#show: init-glossary.with(myGlossary, show-term: (body) => [#emph(body)])
+#show: init-glossary.with(myGlossary, show-term: body => [#emph(body)])
 
 #set heading(numbering: "1.1")
 #set page(height: auto, width: 6.5in, margin: 1em, numbering: "1")
@@ -78,18 +81,51 @@ Articles are incompatible with the `pl` (plural) modifier.
 
 == Using conflicting modifiers (short, long, both)
 
-These modifiers are semantically mutually exclusive, by they can be combined
-syntactically. When multiple are used, `glossy` tries to make a smart choice on
-which one to display.
+These modifiers are semantically mutually exclusive. When multiple are used,
+`glossy` throws an error to the compiler, explaining the problem.
+
+#import "/src/gloss.typ": __default-format-term, __gls
+#let manual-gls(key, mods) = __gls(
+  key,
+  modes-modifiers: mods,
+  format-term: __default-format-term,
+  show-term: body => [#strong(body)],
+  term-links: false,
+  display-text: none,
+)
+#assert-panic(manual-gls.with("tps", ("short", "long")))
+#let msg-short-long = "panicked with: \"Cannot mix modes \", (\"short\", \"long\"), \", pick one.\""
+#let msg-short-both = "panicked with: \"Cannot mix modes \", (\"short\", \"both\"), \", pick one.\""
+#let msg-long-both = "panicked with: \"Cannot mix modes \", (\"long\", \"both\"), \", pick one.\""
+#let msg-short-long-both = "panicked with: \"Cannot mix modes \", (\"short\", \"long\", \"both\"), \", pick one.\""
 
 #table(
   columns: 2,
-  table.header([*Input*], [*Output*]),
+  table.header([*Input*], [*Error*]),
 
-  [`@tps:short:long`     ], [@tps:short:long],
-  [`@tps:short:both`     ], [@tps:short:both],
-  [`@tps:long:both`      ], [@tps:long:both],
-  [`@tps:short:long:both`], [@tps:short:long:both],
+  [`@tps:short:long`     ],
+  [#assert.eq(
+      catch(manual-gls.with("tps", ("short", "long"))),
+      msg-short-long,
+    )#msg-short-long],
+
+  [`@tps:short:both`     ],
+  [#assert.eq(
+      catch(manual-gls.with("tps", ("short", "both"))),
+      msg-short-both,
+    )#msg-short-both],
+
+  [`@tps:long:both`      ],
+  [#assert.eq(
+      catch(manual-gls.with("tps", ("long", "both"))),
+      msg-long-both,
+    )#msg-long-both],
+
+  [`@tps:short:long:both`],
+  [#assert.eq(
+      catch(manual-gls.with("tps", ("short", "long", "both"))),
+      msg-short-long-both,
+    )#msg-short-long-both],
 )
 
 #let my-theme = (
@@ -115,14 +151,20 @@ which one to display.
     block(
       grid(
         columns: (auto, 1fr, auto),
-        output,
-        repeat([#h(0.25em) . #h(0.25em)]),
-        entry.pages,
-      )
+        output, repeat([#h(0.25em) . #h(0.25em)]), entry.pages.join(", "),
+      ),
     )
-  }
+  },
 )
 
 #glossary(theme: my-theme)
-#glossary(title: "Glossary with just empty group", groups: ("",), theme: theme-basic)
-#glossary(title: "Glossary with just Web group", groups: ("Web",), theme: theme-compact)
+#glossary(
+  title: "Glossary with just empty group",
+  groups: ("",),
+  theme: theme-basic,
+)
+#glossary(
+  title: "Glossary with just Web group",
+  groups: ("Web",),
+  theme: theme-compact,
+)
